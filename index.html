@@ -215,8 +215,8 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
    online leaderboard disabled — the game still works offline.
    ============================================================ */
 window.LEADERBOARD = {
-  url: "https://zjjuxhnvnktlbwwjpzun.supabase.co",   // e.g. "https://abcdefgh.supabase.co"
-  key: "sb_publishable_dn6G1130Sg_paKcNDg6s8A_RhhWhGsk"    // your project's anon public key (a long eyJ... string)
+  url: "",   // e.g. "https://abcdefgh.supabase.co"
+  key: ""    // your project's anon public key (a long eyJ... string)
 };
 
 // ===== CCDV-F question bank: 502 questions sourced from CertSafari (developer foundations) =====
@@ -666,12 +666,18 @@ function finishRaid(){clearInterval(R.t);R.t=null;
 function lbOn(){return !!(window.LEADERBOARD&&LEADERBOARD.url&&LEADERBOARD.key);}
 function lbBase(){return LEADERBOARD.url.replace(/\/+$/,"");}
 function lbHeaders(extra){return Object.assign({apikey:LEADERBOARD.key,Authorization:"Bearer "+LEADERBOARD.key},extra||{});}
+function gearSnapshot(){const out=[];for(const k of SLOT_KEYS){const g=S.gear[k];if(g)out.push({s:k,n:g.name,r:g.rarity,v:g.val,st:g.stat});}return out;}
+function gearPanel(g){if(!g||!g.length)return `<div class="small" style="padding:6px 0">No gear recorded for this run.</div>`;
+ const sum={hp:0,pow:0,xp:0,luck:0};g.forEach(x=>{if(sum[x.st]!=null)sum[x.st]+=x.v;});
+ const bx=x=>x.st==="hp"?"+"+x.v+" HP":x.st==="pow"?"+"+x.v+" Power":x.st==="xp"?"+"+x.v+"% XP":"+"+x.v+" Luck";
+ const items=g.slice().sort((a,b)=>SLOT_KEYS.indexOf(a.s)-SLOT_KEYS.indexOf(b.s)).map(x=>`<div class="loot" style="padding:4px 9px;margin:4px 0"><span class="r-${x.r}">${(SLOTS[x.s]&&SLOTS[x.s].i)||"•"} ${esc(x.n)}</span> <span class="small">· ${(SLOTS[x.s]&&SLOTS[x.s].n)||x.s}: ${bx(x)}</span></div>`).join("");
+ return `<div class="small" style="margin:6px 0 8px">❤️ ${sum.hp} HP · ⚔️ ${sum.pow} Power · ✨ +${sum.xp}% XP · 🍀 ${sum.luck} Luck · <b>${g.length}/15</b> slots equipped</div>${items}`;}
 async function submitScore(){if(!lbOn())return {ok:false,reason:"off"};if(!S.raidBest)return {ok:false,reason:"notrial"};
- const body={name:String(S.name).slice(0,24),score:S.raidBest,level:levelInfo().l,readiness:Math.round(readiness()*100)};
+ const body={name:String(S.name).slice(0,24),score:S.raidBest,level:levelInfo().l,readiness:Math.round(readiness()*100),gear:gearSnapshot()};
  try{const r=await fetch(lbBase()+"/rest/v1/scores",{method:"POST",headers:lbHeaders({"Content-Type":"application/json","Prefer":"return=minimal"}),body:JSON.stringify(body)});
   return {ok:r.ok,status:r.status};}catch(e){return {ok:false,reason:String(e)};}}
 async function fetchScores(){if(!lbOn())return null;
- try{const r=await fetch(lbBase()+"/rest/v1/scores?select=name,score,level,readiness&order=score.desc&limit=300",{headers:lbHeaders()});
+ try{const r=await fetch(lbBase()+"/rest/v1/scores?select=name,score,level,readiness,gear&order=score.desc&limit=300",{headers:lbHeaders()});
   if(!r.ok)return {error:r.status};const rows=await r.json();
   const best={};for(const x of rows){const k=(x.name||"?").toLowerCase();if(!best[k]||x.score>best[k].score)best[k]=x;}
   return Object.values(best).sort((a,b)=>b.score-a.score||(b.readiness||0)-(a.readiness||0)).slice(0,25);}
@@ -687,14 +693,17 @@ function leaderboardScreen(fromRaid){M=null;
   if(!rows||rows.error){el.innerHTML=`<p class="small">Couldn't reach the leaderboard right now${rows&&rows.error?" (error "+rows.error+")":""}. Try again in a moment.</p>`;return;}
   if(!rows.length){el.innerHTML=`<p class="small">No scores yet — be the first! Take the Trial of the Proctor, then submit your score.</p>${lbSubmitBtn()}`;return;}
   const me=String(S.name).toLowerCase();
-  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:.92em">
-   <tr style="color:var(--dim);text-align:left"><th style="padding:5px 4px">#</th><th>Hero</th><th style="text-align:right">Score</th><th style="text-align:right">Lv</th><th style="text-align:right">Ready</th></tr>
-   ${rows.map((x,i)=>{const mine=(x.name||"").toLowerCase()===me;const medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":(i+1);
-     return `<tr style="border-top:1px dashed #2a2242;${mine?"background:#1a2b1e":""}">
-      <td style="padding:6px 4px">${medal}</td><td><b style="color:${mine?"var(--ok)":"var(--gold2)"}">${esc(x.name||"?")}</b>${mine?" (you)":""}</td>
-      <td style="text-align:right;color:${x.score>=720?"var(--ok)":"var(--text)"}">${x.score}</td>
-      <td style="text-align:right;color:var(--dim)">${x.level||"—"}</td><td style="text-align:right;color:var(--dim)">${x.readiness!=null?x.readiness+"%":"—"}</td></tr>`;}).join("")}
-   </table><div style="margin-top:12px">${lbSubmitBtn()}</div>`;});}
+  el.innerHTML=`<div style="text-align:left">${rows.map((x,i)=>{const mine=(x.name||"").toLowerCase()===me;const medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":("#"+(i+1));
+     const ng=(x.gear&&x.gear.length)||0;
+     return `<div style="border-top:1px dashed #2a2242;padding:8px 2px;${mine?"background:#16241b;border-radius:6px":""}">
+      <div style="display:flex;align-items:center;gap:8px">
+       <span style="width:34px;color:var(--dim);text-align:center">${medal}</span>
+       <b style="flex:1;color:${mine?"var(--ok)":"var(--gold2)"}">${esc(x.name||"?")}${mine?" (you)":""}</b>
+       <span style="font-weight:bold;color:${x.score>=720?"var(--ok)":"var(--text)"}">${x.score}</span>
+       <span class="small" style="width:104px;text-align:right">Lv ${x.level||"—"} · ${x.readiness!=null?x.readiness+"%":"—"}</span></div>
+      <details style="margin:2px 0 0 34px"><summary style="cursor:pointer;color:var(--dim);font-size:.8em;list-style:none">🎒 loadout${ng?" ("+ng+" items)":""}</summary>${gearPanel(x.gear)}</details>
+     </div>`;}).join("")}</div>
+   <div class="center" style="margin-top:12px">${lbSubmitBtn()}</div>`;});}
 function lbSubmitBtn(){if(!S.raidBest)return `<p class="small">Take the 🏛️ Trial of the Proctor to earn a score, then come back to submit it.</p>`;
  return `<button class="btn gold" id="subbtn" onclick="doSubmit()">📤 Submit my best (${S.raidBest}/1000)</button> <span id="submsg" class="small"></span>`;}
 function doSubmit(){const b=$("subbtn"),m=$("submsg");if(b)b.disabled=true;if(m)m.textContent="Submitting…";
