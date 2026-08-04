@@ -215,8 +215,8 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
    online leaderboard disabled — the game still works offline.
    ============================================================ */
 window.LEADERBOARD = {
-  url: "https://zjjuxhnvnktlbwwjpzun.supabase.co",   // e.g. "https://abcdefgh.supabase.co"
-  key: "sb_publishable_dn6G1130Sg_paKcNDg6s8A_RhhWhGsk"    // your project's anon public key (a long eyJ... string)
+  url: "",   // e.g. "https://abcdefgh.supabase.co"
+  key: ""    // your project's anon public key (a long eyJ... string)
 };
 
 // ===== CCDV-F question bank: 502 questions sourced from CertSafari (developer foundations) =====
@@ -248,7 +248,6 @@ eval:{name:"The Debugging Depths",icon:"🐛",weight:2.6,desc:"Eval, Testing & D
  mobs:[["Flaky Test Bat","🦇"],["Regression Rat","🐀"],["Heisenbug","🪲"]],boss:["The Unreproducible Horror","👁️"],
  lore:"<li><b>Grading:</b> code-graded (cheapest, objective) · LLM-as-judge (rubric + validate vs humans) · human (gold, slow).</li><li><b>Start early & small:</b> ~20 realistic + edge cases; grow from failures; gate every change.</li><li><b>429:</b> exponential backoff + jitter, honor retry-after, queue. <b>529:</b> Anthropic overloaded — retry.</li><li><b>request-id</b> header — log it for support.</li><li><b>Retry-with-error-feedback</b> fixes format/structure errors; useless when info is absent or the source itself is wrong.</li><li><b>Confidence:</b> field-level scores calibrated vs labeled set; stratified sampling of high-confidence outputs.</li><li><b>'Feels better' isn't data</b> — run baseline-vs-new evals.</li>"}
 };
-const EXAM_TS=new Date(2026,7,21).getTime();
 const CLASSES={
  knight:{n:"Agent Knight",i:"⚔️",p:"+40 Max HP — armor forged from retry logic. Endure more wrong answers.",hp:40,xp:0,luck:0,pot:0},
  mage:{n:"Context Mage",i:"🔮",p:"+15% XP from every victory — squeeze more learning from each battle.",hp:0,xp:0.15,luck:0,pot:0},
@@ -320,7 +319,6 @@ function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").repl
 function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function rnd(n){return Math.floor(Math.random()*n);}
 function app(html){$("app").innerHTML=html;window.scrollTo(0,0);}
-function daysLeft(){return Math.max(0,Math.ceil((EXAM_TS-Date.now())/86400000));}
 function levelInfo(){let l=1,x=S.xp,need=100;while(x>=need){x-=need;l++;need=100+(l-1)*50;}return{l,into:x,need};}
 function title(){const l=levelInfo().l;let t=TITLES[0][1];for(const[min,name]of TITLES){if(l>=min)t=name;}return t;}
 function hist(id){return S.hist[id];}
@@ -364,7 +362,7 @@ if(typeof window!=="undefined"&&!window.__saveHook){window.__saveHook=true;
 // ============================ TITLE / NEW GAME ============================
 let pickedClass="knight";
 function renderTitle(){app(`<h1>⚔️ CLAUDE QUEST ⚔️</h1><div class="sub">The CCDV-F Chronicles — an exploration RPG for aspiring Certified Claude Developers</div>
- <div class="countdown">🗓️ The Trial of the Proctor awaits in <b>${daysLeft()} days</b> (Aug 21, 2026)</div>
+ <div class="countdown">🗓️ Train across all 8 exam domains — then face the <b>Trial of the Proctor</b> when you're ready.</div>
  <div class="panel"><p class="lore" style="margin-bottom:10px">Eight realms of the Kingdom of Anthropia lie overrun by the <b>Bugs of Ignorance</b>. Explore their dungeons tile by tile: crack open <b>treasure chests</b> for loot, slay wandering monsters, and topple each realm's boss. Every chest and beast poses a real CCDV-F exam question — answer well to claim gear across <b>15 equipment slots</b> and grow strong enough to pass the final Trial.</p>
  <label class="small">Hero name</label><input type="text" id="heroname" maxlength="20" placeholder="e.g. Rukf the Relentless" value="Rukf">
  <p class="small" style="margin:12px 0 6px">Choose your class:</p>
@@ -380,7 +378,7 @@ function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
  app(`<div class="hud"><div><div class="who">${CLASSES[S.cls].i} ${esc(S.name)} — Lv ${li.l} ${title()}</div>
  <div class="meta">💰 ${S.gold}g · ⚗️ ${S.potions} · ⚔️ ${S.wins} · 📦 ${S.chests} · 🎁 ${S.found} items · 👑 ${S.bosses}</div></div>
  <div style="min-width:180px">${bar("xp",li.into/li.need*100,`XP ${li.into}/${li.need}`)}</div></div>
- <div class="countdown">🗓️ <b>${daysLeft()} days</b> to the exam · Exam-weighted readiness: <b>${Math.round(rd*100)}%</b>${nem?` · 🩸 ${nem} nemeses at large`:""}</div>
+ <div class="countdown">🎯 Exam-weighted readiness: <b>${Math.round(rd*100)}%</b>${nem?` · 🩸 ${nem} nemeses at large`:""}</div>
  ${bar("mast",rd*100,"Overall readiness (weighted like the real CCDV-F)")}
  <h2 style="color:var(--gold2);margin:16px 0 8px">🗺️ Choose a realm to explore</h2>
  <div class="zonegrid">${Object.entries(DOMAINS).map(([k,d])=>{const m=Math.round(mastery(k)*100);const cl=S.cleared[k]?' ✅':'';return `<div class="zone" onclick="enterZone('${k}')"><span class="zicon">${d.icon}</span><h3>${d.name}${cl}</h3><div class="zdesc">${d.desc}</div><span class="wtag">${d.weight}% of exam</span>${bar("mast",m,`Mastery ${m}%`)}</div>`;}).join("")}</div>
