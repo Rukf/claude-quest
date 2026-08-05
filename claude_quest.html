@@ -631,11 +631,12 @@ const CQCloud = (function(){
   active(){ return ready; },
   configured(){ return !!cfg(); },
   // sign in (restore or anonymous), ensure profile, pull authoritative gold + stickers into S
-  async init(){
+  async init(name){
    if(!cfg()) return false;
    try{
     if(!(await refresh())){ await signInAnon(); }
-    await rpc("ensure_profile", { p_name: (S && S.name) ? String(S.name).slice(0,24) : null });
+    const nm = (name || (S && S.name) || "").toString().trim().slice(0,24);
+    await rpc("ensure_profile", { p_name: nm || null });   // creates the profile with the chosen name (or updates it)
     const st = await rpc("get_state", {});
     if(st){ if(typeof st.gold==="number") S.gold = st.gold; S.stickers = {}; const m=st.stickers||{}; for(const k in m) S.stickers[k]=m[k]; }
     ready = true; return true;
@@ -836,13 +837,13 @@ function renderTitle(){app(`<h1>⚔️ CLAUDE QUEST ⚔️</h1><div class="sub">
  <div class="center" style="margin-top:14px"><button class="btn gold" onclick="newGame()">⚡ Begin the Quest</button></div></div>
  <p class="small center">💾 Your progress saves automatically in this browser — just come back to this page anytime to continue.</p>`);}
 function pickClass(k){pickedClass=k;for(const c in CLASSES){const el=$("cc_"+c);if(el)el.classList.toggle("sel",c===k);}}
-function newGame(){const name=($("heroname").value.trim()||"Adventurer");S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot();}
+function newGame(){const name=($("heroname").value.trim()||"Adventurer");S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot(name);}
 
 // ============================ TOWN ============================
 function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
  const li=levelInfo(),rd=readiness(),nem=nemeses(null);
  app(`<div class="hud"><div><div class="who">${CLASSES[S.cls].i} ${esc(S.name)} — Lv ${li.l} ${title()}</div>
- <div class="meta">💰 ${S.gold}g · ⚗️ ${S.potions} · ⚔️ ${S.wins} · 📦 ${S.chests} · 🎁 ${S.found} items · 👑 ${S.bosses}</div></div>
+ <div class="meta">💰 ${S.gold}g · ⚗️ ${S.potions} · ⚔️ ${S.wins} · 📦 ${S.chests} · 🎁 ${S.found} items · 👑 ${S.bosses}${cloudTag()}</div></div>
  <div style="min-width:180px">${bar("xp",li.into/li.need*100,`XP ${li.into}/${li.need}`)}</div></div>
  <div class="countdown">🎯 Exam-weighted readiness: <b>${Math.round(rd*100)}%</b>${nem?` · 🩸 ${nem} nemeses at large`:""}</div>
  ${bar("mast",rd*100,"Overall readiness (weighted like the real CCDV-F)")}
@@ -866,7 +867,8 @@ function buyPotion(){
 // fire-and-forget: server awards the authoritative gold for an event (kill/chest/boss/nat20)
 function cloudAward(kind){if(window.CQCloud&&window.CQCloud.active()){window.CQCloud.award(kind).then(()=>{if(!M&&!E&&!R)updateRail();}).catch(()=>{});}}
 // sign in + pull authoritative gold/collection; re-render town when done
-function cloudBoot(){if(window.CQCloud&&window.CQCloud.configured()){window.CQCloud.init().then(ok=>{if(ok&&S){updateRail();if(!M&&!E&&!R)town();}});}}
+function cloudBoot(name){if(window.CQCloud&&window.CQCloud.configured()){window.CQCloud.init(name).then(ok=>{if(ok&&S){updateRail();if(!M&&!E&&!R)town();}});}}
+function cloudTag(){return (window.CQCloud&&window.CQCloud.active())?' · ☁ synced':(window.CQCloud&&window.CQCloud.configured()?' · ☁ …':'');}
 
 // ============================ MAP GENERATION ============================
 function genMap(dk){const W=9,H=7;
@@ -1257,7 +1259,7 @@ function doSubmit(){const b=$("subbtn"),m=$("submsg");if(b)b.disabled=true;if(m)
   else{if(b)b.disabled=false;if(m)m.textContent=res.reason==="notrial"?"Take a Trial first.":"Couldn't submit — try again.";}});}
 
 // ============================ INIT ============================
-if(typeof document!=="undefined"&&document.getElementById("app")){const sv=loadAuto();if(sv){S=sv;town();cloudBoot();}else renderTitle();}
+if(typeof document!=="undefined"&&document.getElementById("app")){const sv=loadAuto();if(sv){S=sv;town();cloudBoot(S.name);}else renderTitle();}
 </script>
 </body>
 </html>
