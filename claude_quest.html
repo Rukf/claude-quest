@@ -378,27 +378,37 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
 @keyframes lovAcross{from{transform:translateX(-150px)} to{transform:translateX(calc(100vw + 150px))}}
 @keyframes lovAcrossR{from{transform:translateX(calc(100vw + 150px))} to{transform:translateX(-150px)}}
 @keyframes lovBob{0%,100%{transform:translateY(0) rotate(-6deg)} 50%{transform:translateY(-22px) rotate(6deg)}}
-/* ---------- RUHA: convertible drive around Mallorca (site = the car's screen) ---------- */
+/* ---------- RUHA: driver's-eye convertible; the site is the small console screen ---------- */
 body.ruha{background:#0e0b18;}
+body.ruha #rail{display:none;}
 #ruhaScene{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
-#ruhaScene .rz-sky{position:absolute; inset:0; background:linear-gradient(180deg,#3ea7dd 0%,#77c6e8 36%,#c7e9f4 50%,#f7dca6 55%,#efc888 61%,#171226 61%);}
-#ruhaScene .rz-sun{position:absolute; top:7%; right:13%; width:96px; height:96px; border-radius:50%; background:radial-gradient(circle,#fff7cc 30%,#ffd457 62%,transparent 74%); box-shadow:0 0 70px #ffd45788; animation:rzSun 6s ease-in-out infinite;}
+#ruhaScene .rz-sky{position:absolute; left:0; right:0; top:0; height:62%; background:linear-gradient(180deg,#3ea7dd 0%,#77c6e8 46%,#c7e9f4 66%,#f7dca6 82%,#efc888 100%);}
+#ruhaScene .rz-sun{position:absolute; top:6%; right:15%; width:86px; height:86px; border-radius:50%; background:radial-gradient(circle,#fff7cc 30%,#ffd457 62%,transparent 74%); box-shadow:0 0 70px #ffd45788; animation:rzSun 6s ease-in-out infinite;}
 @keyframes rzSun{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-#ruhaScene .rz-sea{position:absolute; top:50%; left:0; right:0; height:7%; background:linear-gradient(180deg,#2f93c4,#1d6f9f); overflow:hidden;}
+#ruhaScene .rz-sea{position:absolute; top:40%; left:0; right:0; height:5%; background:linear-gradient(180deg,#2f93c4,#1d6f9f); overflow:hidden;}
 #ruhaScene .rz-sea::after{content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg,#ffffff26 0 34px,transparent 34px 92px); animation:rzWaves 5s linear infinite;}
 @keyframes rzWaves{from{transform:translateX(0)}to{transform:translateX(-92px)}}
-#ruhaScene .rz-palms{position:absolute; top:42%; left:0; white-space:nowrap; font-size:56px; line-height:1; filter:drop-shadow(0 6px 6px #0005); animation:rzScroll 9s linear infinite;}
+#ruhaScene .rz-palms{position:absolute; top:31%; left:0; white-space:nowrap; font-size:44px; line-height:1; filter:drop-shadow(0 6px 6px #0005); animation:rzScroll 9s linear infinite;}
 @keyframes rzScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-#ruhaScene .rz-road{position:absolute; bottom:0; left:0; right:0; height:39%; background:linear-gradient(180deg,#2c2744,#0a0812);}
-#ruhaScene .rz-road::before{content:""; position:absolute; top:0; left:0; right:0; height:12px; background:linear-gradient(180deg,#4a4370,transparent);}
-#ruhaScene .rz-lane{position:absolute; left:50%; top:0; bottom:0; width:18px; margin-left:-9px; background:repeating-linear-gradient(180deg,#f2d878 0 34px,transparent 34px 82px); background-size:100% 116px; animation:rzLane .55s linear infinite;}
-@keyframes rzLane{from{background-position-y:0}to{background-position-y:116px}}
-.rz-wheel{position:fixed; bottom:-232px; left:50%; margin-left:-190px; width:380px; height:380px; z-index:3; pointer-events:none; transform-origin:50% 50%; animation:rzTilt 4.5s ease-in-out infinite;}
+#ruhaScene .rz-roadband{position:absolute; top:45%; left:0; right:0; height:17%; background:linear-gradient(180deg,#3a3552,#211c33); overflow:hidden;}
+#ruhaScene .rz-roadband .rz-lane{position:absolute; left:50%; top:0; bottom:0; width:16px; margin-left:-8px; background:repeating-linear-gradient(180deg,#f2d878 0 20px,transparent 20px 46px); background-size:100% 66px; animation:rzLane .5s linear infinite;}
+@keyframes rzLane{from{background-position-y:0}to{background-position-y:66px}}
+/* the dashboard fills the lower half; the car is the star */
+#ruhaScene .rz-dash{position:absolute; left:-6%; right:-6%; bottom:0; height:56%; background:linear-gradient(180deg,#2b2338 0%,#161022 58%,#0a0713 100%); border-top-left-radius:52% 74px; border-top-right-radius:52% 74px; box-shadow:inset 0 10px 30px #0009, 0 -14px 36px #0007;}
+#ruhaScene .rz-dash::before{content:""; position:absolute; top:18px; left:8%; right:8%; height:2px; background:linear-gradient(90deg,transparent,#ffffff16,transparent);}
+#ruhaScene .rz-vent{position:absolute; top:40px; width:88px; height:22px; border-radius:7px; background:repeating-linear-gradient(90deg,#0c0913 0 5px,#241d30 5px 10px); box-shadow:inset 0 1px 3px #000;}
+#ruhaScene .rz-plaque{position:absolute; bottom:14px; left:50%; transform:translateX(-50%); color:#d4af37; font-weight:800; letter-spacing:4px; font-size:.78em; opacity:.8;}
+.rz-wheel{position:fixed; bottom:-120px; left:15%; width:300px; height:300px; z-index:4; pointer-events:none; animation:rzTilt 4.5s ease-in-out infinite;}
 @keyframes rzTilt{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
-.rz-badge{position:fixed; top:14px; left:14px; z-index:4; pointer-events:none; background:#0f0b1ccc; border:1px solid #d4af37; border-radius:12px; padding:6px 12px; color:#ffdd82; font-weight:700; font-size:.85em;}
-body.ruha #shell{position:relative; z-index:2; background:#0b0912; border-radius:22px; margin:112px auto 150px; max-width:1060px; padding:14px 10px; box-shadow:0 0 0 5px #12101a, 0 0 0 8px #d4af37cc, 0 26px 70px #000b, inset 0 0 50px #000; animation:rzBob 2.8s ease-in-out infinite;}
-@keyframes rzBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-@media(max-width:900px){ body.ruha #shell{margin:96px 8px 130px; padding:8px 4px;} .rz-wheel{width:280px;height:280px;margin-left:-140px;bottom:-180px;} }
+.rz-speedo{position:fixed; bottom:40px; right:13%; width:118px; height:118px; z-index:4; pointer-events:none;}
+.rz-badge{position:fixed; top:14px; left:14px; z-index:6; pointer-events:none; background:#0f0b1ccc; border:1px solid #d4af37; border-radius:12px; padding:6px 12px; color:#ffdd82; font-weight:700; font-size:.85em;}
+/* the interactive site, shrunk onto the center console */
+body.ruha #shell{position:fixed; z-index:5; left:50%; top:39%; transform:translateX(-50%); width:min(400px,88vw); height:min(340px,44vh); overflow:auto; -webkit-overflow-scrolling:touch;
+  background:#0b0912; border-radius:16px; padding:8px 6px; box-shadow:0 0 0 6px #15121c, 0 0 0 9px #d4af37cc, 0 20px 44px #000c, inset 0 0 30px #000; animation:rzBob 2.8s ease-in-out infinite; scrollbar-width:thin;}
+@keyframes rzBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-5px)}}
+body.ruha #app{padding:10px 8px 34px;}
+body.ruha #app h1{font-size:1.4em;}
+@media(max-width:700px){ body.ruha #shell{top:37%; height:46vh;} .rz-wheel{left:5%;width:230px;height:230px;bottom:-96px;} .rz-speedo{right:7%;width:88px;height:88px;} }
 </style>
 </head>
 <body>
@@ -946,15 +956,20 @@ function startLovable(){if(LOVABLE)return;LOVABLE=true;setTimeout(lovableFloat,1
 // ---- easter egg: Ruha's Mallorca convertible drive (the site becomes the car's screen) ----
 function isRuha(n){return String(n||"").trim().toLowerCase()==="ruha";}
 function wheelSVG(){return `<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="#181322" stroke="#2a2340" stroke-width="16"/><circle cx="100" cy="100" r="86" fill="none" stroke="#0c0a14" stroke-width="4"/><g stroke="#241d34" stroke-width="20" stroke-linecap="round"><line x1="100" y1="100" x2="100" y2="182"/><line x1="100" y1="100" x2="30" y2="72"/><line x1="100" y1="100" x2="170" y2="72"/></g><circle cx="100" cy="100" r="28" fill="#241d34"/><circle cx="100" cy="100" r="11" fill="#d4af37"/></svg>`;}
+function speedoSVG(){let ticks="";for(let i=0;i<=10;i++){const a=(-210+i*24)*Math.PI/180,x1=60+44*Math.cos(a),y1=60+44*Math.sin(a),x2=60+52*Math.cos(a),y2=60+52*Math.sin(a);ticks+=`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#6b6486" stroke-width="${i%5===0?3:1.6}"/>`;}
+ const na=(-210+7*24)*Math.PI/180,nx=60+40*Math.cos(na),ny=60+40*Math.sin(na);
+ return `<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#0e0a18" stroke="#2a2340" stroke-width="4"/>${ticks}<line x1="60" y1="60" x2="${nx.toFixed(1)}" y2="${ny.toFixed(1)}" stroke="#e8556a" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="60" r="6" fill="#d4af37"/><text x="60" y="88" text-anchor="middle" fill="#9a8fb8" font-size="11" font-weight="700">km/h</text></svg>`;}
 function ruhaDrive(){if(document.getElementById("ruhaScene"))return;
  document.body.classList.add("ruha");
  const palm="🌴   ", strip=palm.repeat(20);
  const scene=document.createElement("div");scene.id="ruhaScene";
  scene.innerHTML=`<div class="rz-sky"></div><div class="rz-sun"></div><div class="rz-sea"></div>
    <div class="rz-palms">${strip}${strip}</div>
-   <div class="rz-road"><div class="rz-lane"></div></div>`;
+   <div class="rz-roadband"><div class="rz-lane"></div></div>
+   <div class="rz-dash"><div class="rz-vent" style="left:9%"></div><div class="rz-vent" style="right:9%"></div><div class="rz-plaque">RUHA · MALLORCA</div></div>`;
  document.body.appendChild(scene);
  const wheel=document.createElement("div");wheel.className="rz-wheel";wheel.innerHTML=wheelSVG();document.body.appendChild(wheel);
+ const speedo=document.createElement("div");speedo.className="rz-speedo";speedo.innerHTML=speedoSVG();document.body.appendChild(speedo);
  const badge=document.createElement("div");badge.className="rz-badge";badge.textContent="☀ Mallorca Drive — Ruha";document.body.appendChild(badge);
  window.scrollTo(0,0);}
 function ruhaStop(){const s=document.getElementById("ruhaScene");if(s)s.remove();document.querySelectorAll(".rz-wheel,.rz-badge").forEach(e=>e.remove());document.body.classList.remove("ruha");}
