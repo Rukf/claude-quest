@@ -15,7 +15,30 @@
 *{box-sizing:border-box; margin:0; padding:0;}
 html,body{background:radial-gradient(1200px 800px at 50% -10%, #1e1633 0%, #0d0b14 60%) fixed, var(--bg); color:var(--text);
   font-family:'Segoe UI', 'Trebuchet MS', system-ui, sans-serif; min-height:100%;}
-#app{max-width:860px; margin:0 auto; padding:18px 14px 60px;}
+#shell{display:flex; gap:18px; max-width:1160px; margin:0 auto; align-items:flex-start; justify-content:center;}
+#app{flex:0 1 860px; max-width:860px; min-width:0; margin:0; padding:18px 14px 60px;}
+/* ---------- PERSISTENT GEAR RAIL ---------- */
+#rail{flex:0 0 250px; position:sticky; top:0; align-self:flex-start; max-height:100vh; overflow-y:auto; padding:16px 10px 24px; scrollbar-width:thin;}
+#rail[hidden]{display:none;}
+.railpanel{background:linear-gradient(180deg,#1a1528,#120e1e); border:1px solid var(--border); border-radius:12px; padding:10px 10px 12px;}
+.railhead{font-family:Georgia,serif; color:var(--gold2); font-size:.95em; line-height:1.2; text-align:center; margin-bottom:2px;}
+.railhead .rlv{display:block; color:var(--dim); font-size:.78em; font-style:italic; font-family:'Segoe UI',sans-serif; margin-top:2px;}
+.railstats{display:grid; grid-template-columns:1fr 1fr; gap:4px; margin:8px 0 10px;}
+.rst{background:#0f0c18; border:1px solid var(--border); border-radius:7px; padding:3px 6px; font-size:.76em; text-align:center;}
+.rst b{color:var(--gold2);}
+.raillist{display:flex; flex-direction:column; gap:3px;}
+.rslot{display:flex; align-items:center; gap:6px; border:1px solid var(--border); border-left-width:3px; border-radius:6px; padding:3px 6px; background:#141021; cursor:pointer; transition:filter .12s,transform .12s;}
+.rslot:hover{filter:brightness(1.22); transform:translateX(-2px);}
+.rslot.empty{opacity:.42; border-style:dashed; cursor:default;}
+.rslot.empty:hover{filter:none; transform:none;}
+.rslot .ri{font-size:1.05em; width:18px; text-align:center; flex:none;}
+.rslot .rn{flex:1; min-width:0; font-size:.72em; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.rslot .rb{font-size:.68em; color:var(--dim); flex:none;}
+.q-common.rslot{border-left-color:#8a8a99;} .q-uncommon.rslot{border-left-color:var(--uncommon);}
+.q-rare.rslot{border-left-color:var(--rare);} .q-epic.rslot{border-left-color:var(--epic);}
+.q-legend.rslot{border-left-color:var(--legend); box-shadow:0 0 7px #fb923c44;}
+.railtitle{text-align:center; font-size:.7em; letter-spacing:1px; text-transform:uppercase; color:var(--dim); margin:10px 0 5px;}
+@media(max-width:900px){ #rail{display:none;} }
 h1,h2,h3{font-family:Georgia, 'Times New Roman', serif; letter-spacing:1px;}
 h1{color:var(--gold2); text-shadow:0 0 18px #d4af3755; text-align:center; font-size:2em; margin:10px 0 2px;}
 .sub{color:var(--dim); text-align:center; font-style:italic; margin-bottom:18px;}
@@ -147,7 +170,33 @@ textarea{font-family:monospace; font-size:.8em; min-height:90px;}
 .q-legend.pslot{border-color:var(--legend); box-shadow:0 0 10px #fb923c55;}
 @media(max-width:560px){.paperdoll{grid-template-columns:1fr 1fr;} .pcenter{grid-column:1/3; order:-1; flex-direction:row; flex-wrap:wrap;} .pcenter .statchip{width:auto;}}
 .lootcard{border:2px solid var(--border); border-radius:10px; padding:10px 14px; margin:10px 0; background:#141021; display:flex; align-items:center; gap:12px;}
-.lootcard .li{font-size:2.2em;}
+.lootcard .li{font-size:2.2em; flex:none;}
+.lootcard .lmeta{font-size:.82em; color:var(--dim); margin:2px 0;}
+.lootcard .lmeta b{color:var(--gold2);}
+.lcmp{font-size:.82em; margin-top:4px; padding:4px 8px; border-radius:6px; line-height:1.3;}
+.lcmp.up{color:#7ef0a0; background:#0f2417; border:1px solid #2f6b45;}
+.lcmp.up b{color:#9dffb8;}
+.lcmp.new{color:var(--gold2); background:#241d0f; border:1px solid #6b5a2f;}
+.lcmp.keep{color:var(--dim); background:#161320; border:1px solid var(--border);}
+/* ---------- ITEM DETAIL OVERLAY ---------- */
+.pslot{cursor:default;}
+.q-common.pslot, .q-uncommon.pslot, .q-rare.pslot, .q-epic.pslot, .q-legend.pslot{cursor:pointer;}
+.q-common.pslot:hover, .q-uncommon.pslot:hover, .q-rare.pslot:hover, .q-epic.pslot:hover, .q-legend.pslot:hover{filter:brightness(1.18); transform:translateY(-1px);}
+.pslot .ps .rtag{transform:scale(.86); transform-origin:left center; margin-right:2px;}
+.ovl{position:fixed; inset:0; background:rgba(6,4,14,.72); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; z-index:50; padding:16px; animation:ovlin .18s ease;}
+@keyframes ovlin{from{opacity:0}to{opacity:1}}
+.itemcard{position:relative; width:100%; max-width:340px; background:linear-gradient(180deg,#1c1729,#120e1e); border:2px solid var(--border); border-radius:14px; padding:16px 18px; box-shadow:0 18px 50px #000;}
+.itemcard .ovx{position:absolute; top:8px; right:10px; background:none; border:none; color:var(--dim); font-size:1.1em; cursor:pointer; padding:2px 6px;}
+.itemcard .ovx:hover{color:var(--gold2);}
+.itemcard .itop{display:flex; gap:12px; align-items:center;}
+.itemcard .ibig{font-size:2.8em; filter:drop-shadow(0 4px 10px #000); flex:none;}
+.itemcard .iname{font-family:Georgia,serif; font-weight:bold; font-size:1.12em; line-height:1.15; margin:2px 0;}
+.itemcard .idivider{height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:12px 0 8px;}
+.itemcard .iflavor{margin-top:10px; font-size:.84em; font-style:italic; color:var(--dim); line-height:1.4; border-left:2px solid var(--gold); padding-left:10px;}
+.gearsum{display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px;}
+.gchip{background:#0f0c18; border:1px solid var(--border); border-radius:8px; padding:4px 9px; font-size:.8em;}
+.gchip b{color:var(--gold2);}
+.gchip.r-tag{border-color:currentColor;}
 .chestbig{font-size:4em; text-align:center; filter:drop-shadow(0 6px 14px #000);}
 .chestbig.open{animation:chestpop .6s;}
 @keyframes chestpop{0%{transform:scale(1)}40%{transform:scale(1.25) rotate(-4deg)}100%{transform:scale(1)}}
@@ -229,7 +278,10 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
 </style>
 </head>
 <body>
+<div id="shell">
 <div id="app"></div>
+<aside id="rail" hidden></aside>
+</div>
 <script>
 /* ============================================================
    LEADERBOARD CONFIG — paste your Supabase values between the
@@ -238,8 +290,8 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
    online leaderboard disabled — the game still works offline.
    ============================================================ */
 window.LEADERBOARD = {
-  url: "https://zjjuxhnvnktlbwwjpzun.supabase.co",   // e.g. "https://abcdefgh.supabase.co"
-  key: "sb_publishable_dn6G1130Sg_paKcNDg6s8A_RhhWhGsk"    // your project's anon public key (a long eyJ... string)
+  url: "",   // e.g. "https://abcdefgh.supabase.co"
+  key: ""    // your project's anon public key (a long eyJ... string)
 };
 
 // ===== CCDV-F question bank: 502 questions sourced from CertSafari (developer foundations) =====
@@ -325,14 +377,26 @@ function luck(){return (CLASSES[S.cls].luck||0)+sumStat("luck");}
 function xpMult(){return 1+xpPct()/100;}
 function goldBonus(){return Math.floor(power()/2);}
 // grant a loot item; luckBonus extra for chests/bosses. returns {item,equipped,sell}
+function itemValue(it){return RVAL[it.rarity]+it.val;}
+const STAT_FLAVOR={
+ hp:"Reinforced with defensive wards — you can weather more wrong answers before the dungeon claims you.",
+ pow:"Honed by structured prompting; every correct strike lands harder and shakes loose more gold.",
+ xp:"Attuned to the current of learning — knowledge settles faster while you wear it.",
+ luck:"Bends probability toward fortune, coaxing rarer loot from the chests you crack open."};
+function itemFlavor(it){const q=RARITY[it.rarity].n.toLowerCase();return `A ${q} ${SLOTS[it.slot].n.toLowerCase()}-slot relic. ${STAT_FLAVOR[it.stat]}`;}
 function grantLoot(luckBonus,forceSlot){const rar=rollRarity(luckBonus||0);
  const slotKey=forceSlot||SLOT_KEYS[rnd(SLOT_KEYS.length)];
  const item=makeItem(slotKey,rar);const cur=S.gear[slotKey];
- if(!cur||item.val>gearVal(slotKey)){S.gear[slotKey]=item;S.found=(S.found||0)+1;return {item,equipped:true};}
- const sell=RVAL[rar]+item.val;S.gold+=sell;return {item,equipped:false,sell};}
-function lootCard(res){const it=res.item;
- return `<div class="lootcard q-${it.rarity}"><div class="li">${it.icon}</div><div><div>${rtag(it.rarity)}<b class="r-${it.rarity}">${esc(it.name)}</b></div>
- <div class="small">${SLOTS[it.slot].n} · ${bonusStr(it)} — ${res.equipped?`<b style="color:var(--ok)">equipped!</b>`:`sold for ${res.sell}g (you had better)`}</div></div></div>`;}
+ if(!cur||item.val>gearVal(slotKey)){const prev=cur||null;S.gear[slotKey]=item;S.found=(S.found||0)+1;return {item,equipped:true,prev,delta:item.val-(prev?prev.val:0)};}
+ const sell=RVAL[rar]+item.val;S.gold+=sell;return {item,equipped:false,sell,kept:cur};}
+function lootCard(res){const it=res.item;const s=SLOTS[it.slot];let cmp;
+ if(res.equipped){
+  if(res.prev)cmp=`<div class="lcmp up">▲ Upgrade — <b>+${res.delta} ${STAT_LABEL[it.stat]}</b> over your old ${res.prev.icon} ${esc(res.prev.name)} <span class="small">(${bonusStr(res.prev)})</span></div>`;
+  else cmp=`<div class="lcmp new">✦ Fills your empty ${s.n} slot — <b>${bonusStr(it)}</b> gained</div>`;
+ } else cmp=`<div class="lcmp keep">Your ${res.kept.icon} ${esc(res.kept.name)} <span class="small">(${bonusStr(res.kept)})</span> is still better — sold this for <b>${res.sell}g</b></div>`;
+ return `<div class="lootcard q-${it.rarity}"><div class="li">${it.icon}</div><div style="flex:1;min-width:0">
+  <div>${rtag(it.rarity)} <b class="r-${it.rarity}">${esc(it.name)}</b></div>
+  <div class="lmeta">${s.i} ${s.n} · <b>${bonusStr(it)}</b> · 💰 worth ${itemValue(it)}g</div>${cmp}</div></div>`;}
 
 // ============================ CORE STATE ============================
 QUESTIONS.forEach((q,i)=>{q.id=i;});
@@ -342,7 +406,23 @@ const $=id=>document.getElementById(id);
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
 function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function rnd(n){return Math.floor(Math.random()*n);}
-function app(html){$("app").innerHTML=html;window.scrollTo(0,0);}
+function app(html){$("app").innerHTML=html;updateRail();window.scrollTo(0,0);}
+const STAT_ABBR={hp:"hp",pow:"pow",xp:"xp",luck:"lck"};
+function bonusShort(g){return `+${g.val}${g.stat==="xp"?"%":""} ${STAT_ABBR[g.stat]}`;}
+function railSlot(k){const g=S.gear[k];const s=SLOTS[k];
+ if(!g)return `<div class="rslot empty"><span class="ri">${s.i}</span><span class="rn">${s.n}</span><span class="rb">—</span></div>`;
+ return `<div class="rslot q-${g.rarity}" onclick="itemDetail('${k}')" title="${esc(g.name)}"><span class="ri">${g.icon}</span><span class="rn r-${g.rarity}">${esc(g.name)}</span><span class="rb">${bonusShort(g)}</span></div>`;}
+function railHTML(){const eq=SLOT_KEYS.filter(k=>S.gear[k]).length;
+ return `<div class="railpanel">
+  <div class="railhead">${CLASSES[S.cls].i} ${esc(S.name)}<span class="rlv">Lv ${levelInfo().l} · ${title()}</span></div>
+  <div class="railstats">
+   <span class="rst">❤️ <b>${maxHp()}</b></span><span class="rst">⚔️ <b>${power()}</b></span>
+   <span class="rst">✨ <b>+${xpPct()}%</b></span><span class="rst">🍀 <b>${luck()}</b></span></div>
+  <div class="railtitle">🎒 Equipment · ${eq}/${SLOT_KEYS.length}</div>
+  <div class="raillist">${SLOT_KEYS.map(railSlot).join("")}</div>
+  <button class="btn small" style="width:100%;margin-top:10px" onclick="statsScreen()">🧝 Full details</button></div>`;}
+function updateRail(){const r=$("rail");if(!r)return;
+ if(S){r.hidden=false;r.innerHTML=railHTML();}else{r.hidden=true;r.innerHTML="";}}
 function levelInfo(){let l=1,x=S.xp,need=100;while(x>=need){x-=need;l++;need=100+(l-1)*50;}return{l,into:x,need};}
 function title(){const l=levelInfo().l;let t=TITLES[0][1];for(const[min,name]of TITLES){if(l>=min)t=name;}return t;}
 function hist(id){return S.hist[id];}
@@ -654,7 +734,33 @@ function encDefeat(){S.defeats++;autoSave();E=null;M=null;
 // ============================ CHARACTER / GEAR ============================
 function pslot(k){const g=S.gear[k];const s=SLOTS[k];
  if(!g)return `<div class="pslot empty"><div class="pi">${s.i}</div><div class="pinfo"><div class="pn">${s.n}</div><div class="ps">— empty —</div></div></div>`;
- return `<div class="pslot q-${g.rarity}"><div class="pi">${g.icon}</div><div class="pinfo"><div class="pn r-${g.rarity}">${esc(g.name)}</div><div class="ps">${SLOTS[k].n} · ${bonusStr(g)}</div></div></div>`;}
+ return `<div class="pslot q-${g.rarity}" onclick="itemDetail('${k}')"><div class="pi">${g.icon}</div><div class="pinfo"><div class="pn r-${g.rarity}">${esc(g.name)}</div><div class="ps">${rtag(g.rarity)}${bonusStr(g)}</div></div></div>`;}
+function itemDetail(k){const g=S.gear[k];if(!g)return;const s=SLOTS[k];
+ const ov=document.createElement("div");ov.className="ovl";ov.onclick=e=>{if(e.target===ov)ov.remove();};
+ ov.innerHTML=`<div class="itemcard q-${g.rarity}">
+  <button class="ovx" aria-label="Close" onclick="this.closest('.ovl').remove()">✕</button>
+  <div class="itop"><div class="ibig">${g.icon}</div><div style="min-width:0">
+   <div>${rtag(g.rarity)}</div><div class="iname r-${g.rarity}">${esc(g.name)}</div>
+   <div class="small">${s.i} ${s.n} slot</div></div></div>
+  <div class="idivider"></div>
+  <div class="statline"><span>Primary stat</span><b class="r-${g.rarity}">${bonusStr(g)}</b></div>
+  <div class="statline"><span>Quality</span><b>${RARITY[g.rarity].n}</b></div>
+  <div class="statline"><span>Sell value</span><b>${itemValue(g)}g</b></div>
+  <div class="iflavor">${itemFlavor(g)}</div></div>`;
+ document.body.appendChild(ov);}
+function gearSummary(){const eq=SLOT_KEYS.filter(k=>S.gear[k]);
+ const byR={};eq.forEach(k=>{const r=S.gear[k].rarity;byR[r]=(byR[r]||0)+1;});
+ let best=null;for(const k of eq){const g=S.gear[k];if(!best||itemValue(g)>itemValue(best))best=g;}
+ const rchips=RARITY_ORDER.filter(r=>byR[r]).map(r=>`<span class="gchip r-tag r-${r}">${RARITY[r].n} ×${byR[r]}</span>`).join("");
+ return `<div class="statline"><span>Equipped</span><b>${eq.length}/${SLOT_KEYS.length} slots</b></div>
+  <div class="gearsum">
+   <span class="gchip">❤️ HP from gear <b>+${sumStat("hp")}</b></span>
+   <span class="gchip">⚔️ Power <b>+${sumStat("pow")}</b></span>
+   <span class="gchip">✨ XP <b>+${sumStat("xp")}%</b></span>
+   <span class="gchip">🍀 Luck <b>+${sumStat("luck")}</b></span></div>
+  ${rchips?`<div class="gearsum">${rchips}</div>`:""}
+  ${best?`<div class="small" style="margin-top:6px">👑 Finest piece: <b class="r-${best.rarity}">${esc(best.name)}</b> ${best.icon} <span class="small">(${bonusStr(best)} · ${itemValue(best)}g)</span></div>`:""}
+  <p class="small" style="margin-top:6px;color:var(--dim)">💡 Tap any equipped slot above for full item details.</p>`;}
 function paperdoll(){return `<div class="paperdoll">
  <div class="pcol">${SLOT_LEFT.map(pslot).join("")}</div>
  <div class="pcenter"><div class="pav">${CLASSES[S.cls].i}</div>
@@ -670,6 +776,7 @@ function lootTable(){return `<table style="width:100%;border-collapse:collapse;f
 function statsScreen(){const li=levelInfo();const back=M?`<button class="btn" onclick="renderMap()">⬅ Back to dungeon</button> `:"";
  app(`<h1>🧝 ${esc(S.name)}</h1><div class="sub">Lv ${li.l} ${title()} · ${CLASSES[S.cls].n}</div>
  <div class="panel">${paperdoll()}</div>
+ <div class="panel"><h3 style="color:var(--gold2);margin-bottom:4px">🎒 Equipment summary</h3>${gearSummary()}</div>
  <div class="panel"><div class="statline"><span>Gold</span><b>${S.gold}g</b></div>
  <div class="statline"><span>Potions</span><b>${S.potions}</b></div>
  <div class="statline"><span>Chests opened</span><b>${S.chests}</b></div>
