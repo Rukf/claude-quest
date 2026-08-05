@@ -378,6 +378,27 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
 @keyframes lovAcross{from{transform:translateX(-150px)} to{transform:translateX(calc(100vw + 150px))}}
 @keyframes lovAcrossR{from{transform:translateX(calc(100vw + 150px))} to{transform:translateX(-150px)}}
 @keyframes lovBob{0%,100%{transform:translateY(0) rotate(-6deg)} 50%{transform:translateY(-22px) rotate(6deg)}}
+/* ---------- RUHA: convertible drive around Mallorca (site = the car's screen) ---------- */
+body.ruha{background:#0e0b18;}
+#ruhaScene{position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;}
+#ruhaScene .rz-sky{position:absolute; inset:0; background:linear-gradient(180deg,#3ea7dd 0%,#77c6e8 36%,#c7e9f4 50%,#f7dca6 55%,#efc888 61%,#171226 61%);}
+#ruhaScene .rz-sun{position:absolute; top:7%; right:13%; width:96px; height:96px; border-radius:50%; background:radial-gradient(circle,#fff7cc 30%,#ffd457 62%,transparent 74%); box-shadow:0 0 70px #ffd45788; animation:rzSun 6s ease-in-out infinite;}
+@keyframes rzSun{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+#ruhaScene .rz-sea{position:absolute; top:50%; left:0; right:0; height:7%; background:linear-gradient(180deg,#2f93c4,#1d6f9f); overflow:hidden;}
+#ruhaScene .rz-sea::after{content:""; position:absolute; inset:0; background:repeating-linear-gradient(90deg,#ffffff26 0 34px,transparent 34px 92px); animation:rzWaves 5s linear infinite;}
+@keyframes rzWaves{from{transform:translateX(0)}to{transform:translateX(-92px)}}
+#ruhaScene .rz-palms{position:absolute; top:42%; left:0; white-space:nowrap; font-size:56px; line-height:1; filter:drop-shadow(0 6px 6px #0005); animation:rzScroll 9s linear infinite;}
+@keyframes rzScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#ruhaScene .rz-road{position:absolute; bottom:0; left:0; right:0; height:39%; background:linear-gradient(180deg,#2c2744,#0a0812);}
+#ruhaScene .rz-road::before{content:""; position:absolute; top:0; left:0; right:0; height:12px; background:linear-gradient(180deg,#4a4370,transparent);}
+#ruhaScene .rz-lane{position:absolute; left:50%; top:0; bottom:0; width:18px; margin-left:-9px; background:repeating-linear-gradient(180deg,#f2d878 0 34px,transparent 34px 82px); background-size:100% 116px; animation:rzLane .55s linear infinite;}
+@keyframes rzLane{from{background-position-y:0}to{background-position-y:116px}}
+.rz-wheel{position:fixed; bottom:-232px; left:50%; margin-left:-190px; width:380px; height:380px; z-index:3; pointer-events:none; transform-origin:50% 50%; animation:rzTilt 4.5s ease-in-out infinite;}
+@keyframes rzTilt{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.rz-badge{position:fixed; top:14px; left:14px; z-index:4; pointer-events:none; background:#0f0b1ccc; border:1px solid #d4af37; border-radius:12px; padding:6px 12px; color:#ffdd82; font-weight:700; font-size:.85em;}
+body.ruha #shell{position:relative; z-index:2; background:#0b0912; border-radius:22px; margin:112px auto 150px; max-width:1060px; padding:14px 10px; box-shadow:0 0 0 5px #12101a, 0 0 0 8px #d4af37cc, 0 26px 70px #000b, inset 0 0 50px #000; animation:rzBob 2.8s ease-in-out infinite;}
+@keyframes rzBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media(max-width:900px){ body.ruha #shell{margin:96px 8px 130px; padding:8px 4px;} .rz-wheel{width:280px;height:280px;margin-left:-140px;bottom:-180px;} }
 </style>
 </head>
 <body>
@@ -864,7 +885,7 @@ if(typeof window!=="undefined"&&!window.__saveHook){window.__saveHook=true;
 
 // ============================ TITLE / NEW GAME ============================
 let pickedClass="knight";
-function renderTitle(){app(`<h1>⚔️ CLAUDE QUEST ⚔️</h1><div class="sub">The CCDV-F Chronicles — an exploration RPG for aspiring Certified Claude Developers</div>
+function renderTitle(){ruhaStop();app(`<h1>⚔️ CLAUDE QUEST ⚔️</h1><div class="sub">The CCDV-F Chronicles — an exploration RPG for aspiring Certified Claude Developers</div>
  <div class="countdown">🗓️ Train across all 8 exam domains — then face the <b>Trial of the Proctor</b> when you're ready.</div>
  <div class="panel"><p class="lore" style="margin-bottom:10px">Eight realms of the Kingdom of Anthropia lie overrun by the <b>Bugs of Ignorance</b>. Explore their dungeons tile by tile: crack open <b>treasure chests</b> for loot, slay wandering monsters, and topple each realm's boss. Every chest and beast poses a real CCDV-F exam question — answer well to claim gear across <b>15 equipment slots</b> and grow strong enough to pass the final Trial.</p>
  <label class="small">Hero name</label><input type="text" id="heroname" maxlength="20" placeholder="Enter your hero name…" autocomplete="off" oninput="if($('nameerr'))$('nameerr').textContent='';" onkeydown="if(event.key==='Enter')newGame();">
@@ -877,7 +898,7 @@ function pickClass(k){pickedClass=k;for(const c in CLASSES){const el=$("cc_"+c);
 function newGame(){const inp=$("heroname");const name=inp?inp.value.trim():"";
  if(!name){const err=$("nameerr");if(err)err.textContent="Please enter a hero name to begin.";if(inp){inp.style.borderColor="var(--bad)";inp.focus();}return;}
  if(name.toLowerCase()==="hani"){haniCrash();return;}
- S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot(name);if(isLovableName(name))startLovable();}
+ S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot(name);applyNameFx(name);}
 // ---- easter egg: the hourglass of doom ----
 function hourglassSVG(){return `<svg viewBox="0 0 120 164"><defs><linearGradient id="hgw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4af37"/><stop offset="1" stop-color="#7a5c12"/></linearGradient></defs>
  <rect x="14" y="4" width="92" height="14" rx="5" fill="url(#hgw)"/><rect x="14" y="146" width="92" height="14" rx="5" fill="url(#hgw)"/>
@@ -922,6 +943,22 @@ function lovableFloat(){const el=document.createElement("div");el.className="lov
  document.body.appendChild(el);}
 function lovSchedule(){if(!LOVABLE)return;setTimeout(()=>{if(LOVABLE)lovableFloat();lovSchedule();},9000+Math.random()*13000);}
 function startLovable(){if(LOVABLE)return;LOVABLE=true;setTimeout(lovableFloat,1400);lovSchedule();}
+// ---- easter egg: Ruha's Mallorca convertible drive (the site becomes the car's screen) ----
+function isRuha(n){return String(n||"").trim().toLowerCase()==="ruha";}
+function wheelSVG(){return `<svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="#181322" stroke="#2a2340" stroke-width="16"/><circle cx="100" cy="100" r="86" fill="none" stroke="#0c0a14" stroke-width="4"/><g stroke="#241d34" stroke-width="20" stroke-linecap="round"><line x1="100" y1="100" x2="100" y2="182"/><line x1="100" y1="100" x2="30" y2="72"/><line x1="100" y1="100" x2="170" y2="72"/></g><circle cx="100" cy="100" r="28" fill="#241d34"/><circle cx="100" cy="100" r="11" fill="#d4af37"/></svg>`;}
+function ruhaDrive(){if(document.getElementById("ruhaScene"))return;
+ document.body.classList.add("ruha");
+ const palm="🌴   ", strip=palm.repeat(20);
+ const scene=document.createElement("div");scene.id="ruhaScene";
+ scene.innerHTML=`<div class="rz-sky"></div><div class="rz-sun"></div><div class="rz-sea"></div>
+   <div class="rz-palms">${strip}${strip}</div>
+   <div class="rz-road"><div class="rz-lane"></div></div>`;
+ document.body.appendChild(scene);
+ const wheel=document.createElement("div");wheel.className="rz-wheel";wheel.innerHTML=wheelSVG();document.body.appendChild(wheel);
+ const badge=document.createElement("div");badge.className="rz-badge";badge.textContent="☀ Mallorca Drive — Ruha";document.body.appendChild(badge);
+ window.scrollTo(0,0);}
+function ruhaStop(){const s=document.getElementById("ruhaScene");if(s)s.remove();document.querySelectorAll(".rz-wheel,.rz-badge").forEach(e=>e.remove());document.body.classList.remove("ruha");}
+function applyNameFx(name){if(isLovableName(name))startLovable();if(isRuha(name))ruhaDrive();else ruhaStop();}
 
 // ============================ TOWN ============================
 function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
@@ -1348,7 +1385,7 @@ function doSubmit(){const b=$("subbtn"),m=$("submsg");if(b)b.disabled=true;if(m)
   else{if(b)b.disabled=false;if(m)m.textContent=res.reason==="notrial"?"Take a Trial first.":"Couldn't submit — try again.";}});}
 
 // ============================ INIT ============================
-if(typeof document!=="undefined"&&document.getElementById("app")){const sv=loadAuto();if(sv){S=sv;town();cloudBoot(S.name);if(isLovableName(S.name))startLovable();}else renderTitle();}
+if(typeof document!=="undefined"&&document.getElementById("app")){const sv=loadAuto();if(sv){S=sv;town();cloudBoot(S.name);applyNameFx(S.name);}else renderTitle();}
 </script>
 </body>
 </html>
