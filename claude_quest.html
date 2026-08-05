@@ -429,8 +429,17 @@ const byDomain={}; Object.keys(DOMAINS).forEach(k=>{byDomain[k]=QUESTIONS.filter
 let S=null,M=null,E=null,R=null;
 const $=id=>document.getElementById(id);
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
-// escape HTML, then render `backtick` spans as inline code
-function fmt(s){return esc(s).replace(/`([^`]+)`/g,'<code>$1</code>');}
+// escape HTML, render `backtick` spans as inline code, and auto-highlight
+// code-style identifiers (snake_case, camelCase, PascalCase like PostToolUse).
+// One alternation => each token wrapped at most once (no nesting).
+var CODE_RE=/\b([A-Za-z][A-Za-z0-9]*(?:_+[A-Za-z0-9]+)+|[a-z][a-z0-9]*[A-Z][A-Za-z0-9]*|[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]+)+)\b/g;
+function autoCode(t){return t.replace(CODE_RE,"<code>$1</code>");}
+function fmt(s){
+ return String(s).split(/(`[^`]+`)/).map(function(p){
+  if(p.length>1&&p.charAt(0)==="`"&&p.charAt(p.length-1)==="`")return "<code>"+esc(p.slice(1,-1))+"</code>";
+  return autoCode(esc(p));
+ }).join("");
+}
 function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function rnd(n){return Math.floor(Math.random()*n);}
 function app(html){$("app").innerHTML=html;updateRail();window.scrollTo(0,0);}
