@@ -364,8 +364,8 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
    online leaderboard disabled — the game still works offline.
    ============================================================ */
 window.LEADERBOARD = {
-  url: "",   // e.g. "https://abcdefgh.supabase.co"
-  key: ""    // your project's anon public key (a long eyJ... string)
+  url: "https://zjjuxhnvnktlbwwjpzun.supabase.co",   // e.g. "https://abcdefgh.supabase.co"
+  key: "sb_publishable_dn6G1130Sg_paKcNDg6s8A_RhhWhGsk"    // your project's anon public key (a long eyJ... string)
 };
 
 // ===== CCDV-F question bank: 502 questions sourced from CertSafari (developer foundations) =====
@@ -831,13 +831,16 @@ let pickedClass="knight";
 function renderTitle(){app(`<h1>⚔️ CLAUDE QUEST ⚔️</h1><div class="sub">The CCDV-F Chronicles — an exploration RPG for aspiring Certified Claude Developers</div>
  <div class="countdown">🗓️ Train across all 8 exam domains — then face the <b>Trial of the Proctor</b> when you're ready.</div>
  <div class="panel"><p class="lore" style="margin-bottom:10px">Eight realms of the Kingdom of Anthropia lie overrun by the <b>Bugs of Ignorance</b>. Explore their dungeons tile by tile: crack open <b>treasure chests</b> for loot, slay wandering monsters, and topple each realm's boss. Every chest and beast poses a real CCDV-F exam question — answer well to claim gear across <b>15 equipment slots</b> and grow strong enough to pass the final Trial.</p>
- <label class="small">Hero name</label><input type="text" id="heroname" maxlength="20" placeholder="e.g. Rukf the Relentless" value="Rukf">
- <p class="small" style="margin:12px 0 6px">Choose your class:</p>
+ <label class="small">Hero name</label><input type="text" id="heroname" maxlength="20" placeholder="Enter your hero name…" autocomplete="off" oninput="if($('nameerr'))$('nameerr').textContent='';" onkeydown="if(event.key==='Enter')newGame();">
+ <div id="nameerr" class="small" style="color:var(--bad); min-height:1.1em; margin-top:4px"></div>
+ <p class="small" style="margin:8px 0 6px">Choose your class:</p>
  <div class="row">${Object.entries(CLASSES).map(([k,c])=>`<div class="classcard ${k===pickedClass?'sel':''}" id="cc_${k}" onclick="pickClass('${k}')"><div class="cicon">${c.i}</div><h3>${c.n}</h3><p>${c.p}</p></div>`).join("")}</div>
  <div class="center" style="margin-top:14px"><button class="btn gold" onclick="newGame()">⚡ Begin the Quest</button></div></div>
  <p class="small center">💾 Your progress saves automatically in this browser — just come back to this page anytime to continue.</p>`);}
 function pickClass(k){pickedClass=k;for(const c in CLASSES){const el=$("cc_"+c);if(el)el.classList.toggle("sel",c===k);}}
-function newGame(){const name=($("heroname").value.trim()||"Adventurer");S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot(name);}
+function newGame(){const inp=$("heroname");const name=inp?inp.value.trim():"";
+ if(!name){const err=$("nameerr");if(err)err.textContent="Please enter a hero name to begin.";if(inp){inp.style.borderColor="var(--bad)";inp.focus();}return;}
+ S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot(name);}
 
 // ============================ TOWN ============================
 function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
