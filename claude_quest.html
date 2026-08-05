@@ -372,6 +372,12 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
 .crush-cap{position:absolute; left:-60px; right:-60px; bottom:-52px; text-align:center; color:var(--gold2); font-weight:800; font-size:1.25em; text-shadow:0 0 16px #e8c35a66; opacity:0; animation:capin .5s 1.05s forwards;}
 @keyframes capin{to{opacity:1}}
 .crush-hint{position:fixed; bottom:26px; left:0; right:0; text-align:center; color:var(--dim); font-size:.84em; opacity:0; animation:capin .5s 1.7s forwards;}
+/* ---------- "lovable" floating heart (name easter egg) ---------- */
+.lovheart{position:fixed; z-index:115; pointer-events:none; left:0; will-change:transform; filter:drop-shadow(0 6px 12px #0007);}
+.lovheart .lovbob{animation:lovBob 1.5s ease-in-out infinite;}
+@keyframes lovAcross{from{transform:translateX(-150px)} to{transform:translateX(calc(100vw + 150px))}}
+@keyframes lovAcrossR{from{transform:translateX(calc(100vw + 150px))} to{transform:translateX(-150px)}}
+@keyframes lovBob{0%,100%{transform:translateY(0) rotate(-6deg)} 50%{transform:translateY(-22px) rotate(6deg)}}
 </style>
 </head>
 <body>
@@ -870,7 +876,7 @@ function pickClass(k){pickedClass=k;for(const c in CLASSES){const el=$("cc_"+c);
 function newGame(){const inp=$("heroname");const name=inp?inp.value.trim():"";
  if(!name){const err=$("nameerr");if(err)err.textContent="Please enter a hero name to begin.";if(inp){inp.style.borderColor="var(--bad)";inp.focus();}return;}
  if(name.toLowerCase()==="hani"){haniCrash();return;}
- S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot(name);}
+ S=normalize({v:2,name,cls:pickedClass,xp:0,gold:50,potions:1,gear:{},hist:{},wins:0,chests:0,bosses:0,defeats:0,found:0,cleared:{},raidBest:null});autoSave();town();cloudBoot(name);if(isLovableName(name))startLovable();}
 // ---- easter egg: the hourglass of doom ----
 function hourglassSVG(){return `<svg viewBox="0 0 120 164"><defs><linearGradient id="hgw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4af37"/><stop offset="1" stop-color="#7a5c12"/></linearGradient></defs>
  <rect x="14" y="4" width="92" height="14" rx="5" fill="url(#hgw)"/><rect x="14" y="146" width="92" height="14" rx="5" fill="url(#hgw)"/>
@@ -895,6 +901,25 @@ function haniCrash(){const ov=document.createElement("div");ov.className="crusho
   <div class="crush-hint">(click anywhere to escape the sands of time)</div>`;
  ov.onclick=()=>ov.remove();
  document.body.appendChild(ov);}
+// ---- easter egg: an original cute "lovable" heart mascot that drifts across sometimes ----
+let LOVABLE=false;
+function isLovableName(n){return ["ismir","isma","harambasha"].indexOf(String(n||"").trim().toLowerCase())>=0;}
+function lovableSVG(){return `<svg viewBox="0 0 100 96" width="80" height="77"><defs><linearGradient id="lovg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7aa8"/><stop offset="1" stop-color="#e63e6d"/></linearGradient></defs>
+ <path d="M50 90 C10 60 2 34 20 18 C33 6 49 13 50 30 C51 13 67 6 80 18 C98 34 90 60 50 90 Z" fill="url(#lovg)" stroke="#fff" stroke-width="4" stroke-linejoin="round"/>
+ <circle cx="30" cy="54" r="6" fill="#ff9ec2" opacity=".75"/><circle cx="70" cy="54" r="6" fill="#ff9ec2" opacity=".75"/>
+ <circle cx="38" cy="44" r="5.5" fill="#fff"/><circle cx="62" cy="44" r="5.5" fill="#fff"/>
+ <circle cx="39.5" cy="45.5" r="2.6" fill="#3a1020"/><circle cx="63.5" cy="45.5" r="2.6" fill="#3a1020"/>
+ <path d="M40 58 Q50 67 60 58" stroke="#3a1020" stroke-width="3" fill="none" stroke-linecap="round"/>
+ <path d="M83 12 l2.2 5.6 5.6 2.2 -5.6 2.2 -2.2 5.6 -2.2 -5.6 -5.6 -2.2 5.6 -2.2 z" fill="#ffe08a"/></svg>`;}
+function lovableFloat(){const el=document.createElement("div");el.className="lovheart";
+ el.style.top=(6+Math.floor(Math.random()*68))+"vh";
+ const rtl=Math.random()<0.5, dur=(7+Math.random()*4).toFixed(1), sc=(0.6+Math.random()*0.7).toFixed(2);
+ el.style.animation=(rtl?"lovAcrossR":"lovAcross")+" "+dur+"s linear forwards";
+ el.innerHTML=`<div class="lovbob" style="animation-duration:${(1.1+Math.random()).toFixed(1)}s"><div style="transform:scale(${sc})${rtl?" scaleX(-1)":""}">${lovableSVG()}</div></div>`;
+ el.addEventListener("animationend",()=>el.remove());
+ document.body.appendChild(el);}
+function lovSchedule(){if(!LOVABLE)return;setTimeout(()=>{if(LOVABLE)lovableFloat();lovSchedule();},9000+Math.random()*13000);}
+function startLovable(){if(LOVABLE)return;LOVABLE=true;setTimeout(lovableFloat,1400);lovSchedule();}
 
 // ============================ TOWN ============================
 function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
@@ -1321,7 +1346,7 @@ function doSubmit(){const b=$("subbtn"),m=$("submsg");if(b)b.disabled=true;if(m)
   else{if(b)b.disabled=false;if(m)m.textContent=res.reason==="notrial"?"Take a Trial first.":"Couldn't submit — try again.";}});}
 
 // ============================ INIT ============================
-if(typeof document!=="undefined"&&document.getElementById("app")){const sv=loadAuto();if(sv){S=sv;town();cloudBoot(S.name);}else renderTitle();}
+if(typeof document!=="undefined"&&document.getElementById("app")){const sv=loadAuto();if(sv){S=sv;town();cloudBoot(S.name);if(isLovableName(S.name))startLovable();}else renderTitle();}
 </script>
 </body>
 </html>
