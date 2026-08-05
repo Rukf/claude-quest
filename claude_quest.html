@@ -364,8 +364,8 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
    online leaderboard disabled — the game still works offline.
    ============================================================ */
 window.LEADERBOARD = {
-  url: "https://zjjuxhnvnktlbwwjpzun.supabase.co",   // e.g. "https://abcdefgh.supabase.co"
-  key: "sb_publishable_dn6G1130Sg_paKcNDg6s8A_RhhWhGsk"    // your project's anon public key (a long eyJ... string)
+  url: "https://zjjuxhnvnktlbwwjpzun.supabase.co",   // Supabase project URL
+  key: "sb_publishable_dn6G1130Sg_paKcNDg6s8A_RhhWhGsk"  // publishable (client-safe) key
 };
 
 // ===== CCDV-F question bank: 502 questions sourced from CertSafari (developer foundations) =====
@@ -606,16 +606,21 @@ const CQCloud = (function(){
  const RT_KEY = "cq_rt";           // persisted refresh token (identity only, never gold)
  let AT = null;                    // access token (in-memory)
  let ready = false;                // successfully signed in + synced
+ let lastError = null;             // last cloud failure, surfaced in the UI
  function cfg(){ return (typeof window!=="undefined" && window.LEADERBOARD && window.LEADERBOARD.url && window.LEADERBOARD.key) ? window.LEADERBOARD : null; }
  function base(){ return cfg().url.replace(/\/+$/,""); }
  function key(){ return cfg().key; }
  async function authFetch(path, body){
-  const res = await fetch(base()+path, {method:"POST", headers:{apikey:key(),"Content-Type":"application/json"}, body:JSON.stringify(body||{})});
-  if(!res.ok) throw new Error("auth "+res.status);
-  return res.json();
+  let res;
+  try{ res = await fetch(base()+path, {method:"POST", headers:{apikey:key(),"Content-Type":"application/json"}, body:JSON.stringify(body||{})}); }
+  catch(e){ throw new Error("network error reaching Supabase (check the project URL)"); }
+  const txt = await res.text();
+  if(!res.ok){ let m="HTTP "+res.status; try{const j=JSON.parse(txt); m=(j.msg||j.error_description||j.error_code||j.message||j.error||m);}catch(e){ if(txt) m=txt.slice(0,200); } throw new Error(m); }
+  return txt ? JSON.parse(txt) : {};
  }
  function saveSession(s){ if(s && s.access_token){ AT=s.access_token; if(s.refresh_token){ try{localStorage.setItem(RT_KEY,s.refresh_token);}catch(e){} } } }
- async function signInAnon(){ const s = await authFetch("/auth/v1/signup", {}); saveSession(s); return s; }
+ // Supabase anonymous sign-in: POST /auth/v1/signup with no email/phone (matches supabase-js payload).
+ async function signInAnon(){ const s = await authFetch("/auth/v1/signup", {data:{}, gotrue_meta_security:{}}); saveSession(s); if(!AT) throw new Error("no session returned from anonymous sign-in"); return s; }
  async function refresh(){ let rt=null; try{rt=localStorage.getItem(RT_KEY);}catch(e){} if(!rt) return null;
   try{ const s = await authFetch("/auth/v1/token?grant_type=refresh_token", {refresh_token:rt}); saveSession(s); return s; }
   catch(e){ try{localStorage.removeItem(RT_KEY);}catch(_){} return null; } }
@@ -630,6 +635,7 @@ const CQCloud = (function(){
  return {
   active(){ return ready; },
   configured(){ return !!cfg(); },
+  status(){ return { configured: !!cfg(), active: ready, error: lastError }; },
   // sign in (restore or anonymous), ensure profile, pull authoritative gold + stickers into S
   async init(name){
    if(!cfg()) return false;
@@ -639,8 +645,8 @@ const CQCloud = (function(){
     await rpc("ensure_profile", { p_name: nm || null });   // creates the profile with the chosen name (or updates it)
     const st = await rpc("get_state", {});
     if(st){ if(typeof st.gold==="number") S.gold = st.gold; S.stickers = {}; const m=st.stickers||{}; for(const k in m) S.stickers[k]=m[k]; }
-    ready = true; return true;
-   }catch(e){ console.warn("[cloud] init failed, local mode:", e.message); ready=false; return false; }
+    ready = true; lastError = null; return true;
+   }catch(e){ lastError = e.message; console.error("[cloud] connect failed → local mode:", e.message); ready=false; return false; }
   },
   async award(kind){ const r = await rpc("award_event", {p_kind:kind}); if(r&&typeof r.gold==="number") S.gold=r.gold; return r; },
   async buyPotion(){ const r = await rpc("buy_potion", {}); if(r&&typeof r.gold==="number") S.gold=r.gold; return r; },
@@ -848,6 +854,7 @@ function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
  app(`<div class="hud"><div><div class="who">${CLASSES[S.cls].i} ${esc(S.name)} — Lv ${li.l} ${title()}</div>
  <div class="meta">💰 ${S.gold}g · ⚗️ ${S.potions} · ⚔️ ${S.wins} · 📦 ${S.chests} · 🎁 ${S.found} items · 👑 ${S.bosses}${cloudTag()}</div></div>
  <div style="min-width:180px">${bar("xp",li.into/li.need*100,`XP ${li.into}/${li.need}`)}</div></div>
+ ${cloudBanner()}
  <div class="countdown">🎯 Exam-weighted readiness: <b>${Math.round(rd*100)}%</b>${nem?` · 🩸 ${nem} nemeses at large`:""}</div>
  ${bar("mast",rd*100,"Overall readiness (weighted like the real CCDV-F)")}
  <h2 style="color:var(--gold2);margin:16px 0 8px">🗺️ Choose a realm to explore</h2>
@@ -870,8 +877,12 @@ function buyPotion(){
 // fire-and-forget: server awards the authoritative gold for an event (kill/chest/boss/nat20)
 function cloudAward(kind){if(window.CQCloud&&window.CQCloud.active()){window.CQCloud.award(kind).then(()=>{if(!M&&!E&&!R)updateRail();}).catch(()=>{});}}
 // sign in + pull authoritative gold/collection; re-render town when done
-function cloudBoot(name){if(window.CQCloud&&window.CQCloud.configured()){window.CQCloud.init(name).then(ok=>{if(ok&&S){updateRail();if(!M&&!E&&!R)town();}});}}
-function cloudTag(){return (window.CQCloud&&window.CQCloud.active())?' · ☁ synced':(window.CQCloud&&window.CQCloud.configured()?' · ☁ …':'');}
+function cloudBoot(name){if(window.CQCloud&&window.CQCloud.configured()){window.CQCloud.init(name).then(()=>{if(S){updateRail();if(!M&&!E&&!R)town();}});}}
+function cloudStat(){return (window.CQCloud&&window.CQCloud.status)?window.CQCloud.status():{configured:false,active:false,error:null};}
+function cloudTag(){const s=cloudStat();return s.active?' · ☁ synced':(s.configured?(s.error?' · ☁ offline':' · ☁ …'):'');}
+function cloudBanner(){const s=cloudStat();if(!s.configured||s.active)return '';
+ if(s.error)return `<div class="countdown" style="border-color:#7c4455;color:#ffb3a0">☁ Cloud not connected — <b>${esc(s.error)}</b>. Check the project URL/anon key, and enable <b>Anonymous sign-ins</b> in Supabase → Authentication → Providers.</div>`;
+ return `<div class="countdown" style="border-color:#4b6584;color:#a9c0e0">☁ Connecting to the cloud…</div>`;}
 
 // ============================ MAP GENERATION ============================
 function genMap(dk){const W=9,H=7;
