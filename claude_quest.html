@@ -100,6 +100,15 @@ textarea{font-family:'SF Mono',ui-monospace,monospace; font-size:.8em; min-heigh
   background:linear-gradient(180deg,#221a3a,#160f28); border:1px solid var(--border); border-radius:12px; padding:12px 16px; margin-bottom:12px; box-shadow:0 6px 22px #00000044, inset 0 1px 0 #ffffff0d;}
 .hud .who{font-family:'Avenir Next','Segoe UI',system-ui,-apple-system,sans-serif; color:var(--gold2); font-weight:700; text-shadow:0 0 14px #e8c35a44;}
 .hud .meta{color:var(--dim); font-size:.85em;}
+.goldbig{display:inline-flex; align-items:center; gap:7px; margin-top:9px; background:linear-gradient(180deg,#3d2f0e,#241a06); border:1px solid var(--gold); border-radius:22px; padding:6px 15px; font-size:1.5em; color:var(--gold2); box-shadow:0 0 16px #e8c35a3a, inset 0 1px 0 #ffffff18; text-shadow:0 0 10px #e8c35a66; line-height:1;}
+.goldbig b{font-size:1.05em; font-weight:800; color:#ffe9a8; letter-spacing:.01em;}
+.goldbig .glabel{font-size:.5em; color:var(--gold); text-transform:uppercase; letter-spacing:.1em; font-weight:700; align-self:center;}
+/* ---------- PERSISTENT TOWN BUTTON ---------- */
+#homebar{position:fixed; left:16px; bottom:16px; z-index:45; background:linear-gradient(180deg,#6a531a,#40310c); border:1px solid var(--gold); color:var(--gold2); border-radius:26px; padding:11px 20px; font:700 .96em 'Avenir Next','Segoe UI',system-ui,sans-serif; cursor:pointer; box-shadow:0 8px 22px #000a,0 0 18px #e8c35a44; text-shadow:0 0 8px #e8c35a55; transition:transform .14s,box-shadow .14s;}
+#homebar[hidden]{display:none;}
+#homebar:hover{transform:translateY(-2px); box-shadow:0 10px 26px #000c,0 0 24px #e8c35a77;}
+#homebar:active{transform:translateY(0);}
+@media(max-width:640px){#homebar{left:12px; bottom:12px; padding:10px 16px; font-size:.9em;}}
 /* ---------- ZONES ---------- */
 .zonegrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(244px,1fr)); gap:12px;}
 .zone{position:relative; border:1px solid var(--border); border-radius:12px; overflow:hidden; cursor:pointer; min-height:214px;
@@ -181,11 +190,39 @@ textarea{font-family:'SF Mono',ui-monospace,monospace; font-size:.8em; min-heigh
 .cell .drop{position:absolute; top:1px; right:3px; font-size:.5em;}
 .cell.boss{box-shadow:inset 0 0 0 2px #c98bff77; animation:glowE 2s ease-in-out infinite;}
 .legend{display:flex; flex-wrap:wrap; gap:4px 12px; justify-content:center; color:var(--dim); font-size:.78em; margin:8px 0;}
-.dpad{display:grid; grid-template-columns:repeat(3,54px); grid-template-rows:repeat(3,44px); gap:5px; justify-content:center; margin:12px auto;}
-.dpad button{font-size:1.2em; background:linear-gradient(180deg,#2c2148,#1d1533); border:1px solid var(--line2); color:var(--gold2); border-radius:10px; cursor:pointer; transition:all .12s;}
-.dpad button:hover{border-color:var(--gold); box-shadow:0 0 10px #e8c35a33;}
-.dpad button:active{transform:translateY(1px);}
+.dpad{display:grid; grid-template-columns:repeat(3,60px); grid-template-rows:repeat(3,60px); gap:6px; justify-content:center; margin:16px auto 10px; filter:drop-shadow(0 8px 16px #0009);}
+.dpad .dbtn{font-size:1.4em; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 30%,#3c2e60,#211838); border:1px solid var(--line2); color:var(--gold2); border-radius:16px; cursor:pointer; transition:transform .1s,box-shadow .12s,border-color .12s,color .12s; box-shadow:inset 0 1px 0 #ffffff20, inset 0 -4px 7px #00000055, 0 3px 5px #0007; text-shadow:0 1px 2px #000;}
+.dpad .dbtn.up{border-radius:16px 16px 8px 8px;} .dpad .dbtn.down{border-radius:8px 8px 16px 16px;}
+.dpad .dbtn.left{border-radius:16px 8px 8px 16px;} .dpad .dbtn.right{border-radius:8px 16px 16px 8px;}
+.dpad .dbtn:hover{border-color:var(--gold); color:#fff2c8; box-shadow:inset 0 1px 0 #ffffff2a,0 0 16px #e8c35a66; transform:translateY(-1px);}
+.dpad .dbtn:active{transform:translateY(2px) scale(.95); box-shadow:inset 0 3px 7px #000000aa;}
+.dpad .hub{display:flex; align-items:center; justify-content:center; font-size:1.3em; border-radius:50%; background:radial-gradient(circle at 50% 32%,#241a40,#100a20); border:1px solid var(--border); box-shadow:inset 0 2px 7px #000000aa, 0 0 8px #0006; filter:drop-shadow(0 0 5px #0007);}
 .dpad .sp{visibility:hidden;}
+/* ---------- MAP BIOMES ---------- */
+.grid.bi-water{background:#071e2a; box-shadow:inset 0 2px 16px #00000077,0 0 20px #16607844;}
+.grid.bi-forest{background:#0a1d10; box-shadow:inset 0 2px 16px #00000077,0 0 20px #1c5a2c44;}
+.grid.bi-rocky{background:#141118; box-shadow:inset 0 2px 16px #00000088,0 0 18px #4a445544;}
+.grid.bi-desert{background:#241a0c; box-shadow:inset 0 2px 16px #00000066,0 0 20px #b98a4444;}
+.grid.bi-fire{background:#1e0a08; box-shadow:inset 0 2px 16px #00000088,0 0 22px #ff5a1e44;}
+.bi-water .cell.floor{background:linear-gradient(160deg,#15455e,#0d2a3c); border-color:#1c5a70;}
+.bi-forest .cell.floor{background:linear-gradient(160deg,#1a3d24,#102817); border-color:#245c32;}
+.bi-rocky .cell.floor{background:linear-gradient(160deg,#2b2836,#1a1822); border-color:#3d3a4c;}
+.bi-desert .cell.floor{background:linear-gradient(160deg,#5a4526,#3a2c15); border-color:#7a5c2e;}
+.bi-fire .cell.floor{background:linear-gradient(160deg,#3e1c14,#26100a); border-color:#6e2c1a;}
+.bi-water .cell.wall{background:repeating-linear-gradient(45deg,#0c3244,#0c3244 4px,#08222f 4px,#08222f 8px); border-color:#0c3244;}
+.bi-forest .cell.wall{background:repeating-linear-gradient(45deg,#123a1e,#123a1e 4px,#0c2716 4px,#0c2716 8px); border-color:#123a1e;}
+.bi-rocky .cell.wall{background:repeating-linear-gradient(45deg,#35313f,#35313f 4px,#221f2b 4px,#221f2b 8px); border-color:#35313f;}
+.bi-desert .cell.wall{background:repeating-linear-gradient(45deg,#4a3818,#4a3818 4px,#33260f 4px,#33260f 8px); border-color:#4a3818;}
+.bi-fire .cell.wall{background:repeating-linear-gradient(45deg,#5a2412,#5a2412 4px,#3a160a 4px,#3a160a 8px); border-color:#5a2412;}
+.cell .cg{position:relative; z-index:1; line-height:1;}
+.bi-water .cell.floor::before,.bi-fire .cell.floor::before,.bi-forest .cell.floor::before,.bi-desert .cell.floor::before,.bi-rocky .cell.floor::before{content:""; position:absolute; inset:0; z-index:0; border-radius:8px; pointer-events:none;}
+.bi-water .cell.floor::before{background:radial-gradient(circle at 50% 28%,#4fd8e828,transparent 68%); animation:biWater 3.4s ease-in-out infinite;}
+.bi-fire .cell.floor::before{background:radial-gradient(circle at 50% 92%,#ff7a2e44,transparent 70%); animation:biFire 1.7s ease-in-out infinite;}
+.bi-forest .cell.floor::before{background:radial-gradient(circle at 70% 22%,#6fe08a20,transparent 60%);}
+.bi-desert .cell.floor::before{background:linear-gradient(180deg,#ffd88a14,transparent 60%);}
+.bi-rocky .cell.floor::before{background:radial-gradient(circle at 40% 30%,#ffffff10,transparent 55%);}
+@keyframes biWater{0%,100%{opacity:.3}50%{opacity:.9}}
+@keyframes biFire{0%,100%{opacity:.35}50%{opacity:1}}
 /* ---------- PAPERDOLL ---------- */
 .paperdoll{display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:start; margin:6px 0;}
 .pcol{display:flex; flex-direction:column; gap:6px;}
@@ -267,12 +304,17 @@ textarea{font-family:'SF Mono',ui-monospace,monospace; font-size:.8em; min-heigh
 .d20.hi svg{filter:hue-rotate(155deg) saturate(1.25) drop-shadow(0 5px 8px rgba(0,0,0,.6));}
 .dicemsg{position:fixed; top:64vh; left:0; right:0; text-align:center; font-family:'Avenir Next','Segoe UI',system-ui,-apple-system,sans-serif; font-size:1.5em; color:var(--gold2); text-shadow:0 2px 6px #000; padding:0 16px; animation:msgIn .3s ease-out;}
 @keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.classcard{cursor:pointer; text-align:center; border:1px solid var(--border); border-radius:10px;
-  padding:16px 10px; background:linear-gradient(180deg,var(--panel3),#161126); transition:all .15s;}
-.classcard:hover, .classcard.sel{border-color:var(--gold); box-shadow:0 0 14px #d4af3733;}
-.classcard .cicon{font-size:2.6em;}
-.classcard h3{color:var(--gold2); margin:6px 0 4px;}
-.classcard p{color:var(--dim); font-size:.82em; line-height:1.4;}
+.classcard{position:relative; flex:1 1 0; min-width:152px; cursor:pointer; text-align:center; border:1px solid var(--border);
+  border-radius:12px; overflow:hidden; min-height:158px; display:flex; transition:transform .15s,box-shadow .15s,border-color .15s;}
+.classcard .ccbg{position:absolute; inset:0; width:100%; height:100%; z-index:0; transition:transform .35s;}
+.classcard:hover .ccbg{transform:scale(1.07);}
+.classcard .ccshade{position:absolute; inset:0; z-index:1; background:linear-gradient(180deg,#0c0a18a2 0%,#0c0a1855 42%,#0c0a18de 100%);}
+.classcard .ccbody{position:relative; z-index:2; width:100%; align-self:center; padding:16px 12px;}
+.classcard:hover{border-color:#6b5299; transform:translateY(-3px); box-shadow:0 12px 26px #00000077,0 0 20px #7a5cc040;}
+.classcard.sel{border-color:var(--gold); box-shadow:inset 0 0 0 2px var(--gold),0 0 20px #d4af3766;}
+.classcard .cicon{font-size:2.7em; filter:drop-shadow(0 3px 8px #000c);}
+.classcard h3{color:var(--gold2); margin:7px 0 4px; text-shadow:0 1px 4px #000,0 0 12px #0009;}
+.classcard p{color:#d8cff0; font-size:.82em; line-height:1.4; text-shadow:0 1px 3px #000b;}
 .countdown{text-align:center; color:var(--gold2); font-family:'Avenir Next','Segoe UI',system-ui,-apple-system,sans-serif; font-size:1.02em;
   background:#141021; border:1px solid #8a6d1f55; border-radius:8px; padding:8px; margin:10px 0;}
 .small{font-size:.83em; color:var(--dim);}
@@ -490,6 +532,7 @@ body.ruha #tavern{display:none;}
 <div id="app"></div>
 <aside id="rail" hidden></aside>
 </div>
+<button id="homebar" hidden onclick="town()">🏰 Town</button>
 <script>
 /* ============================================================
    LEADERBOARD CONFIG — paste your Supabase values between the
@@ -897,7 +940,7 @@ eval:{name:"The Debugging Depths",icon:"🐛",weight:2.6,desc:"Eval, Testing & D
 const CLASSES={
  knight:{n:"Agent Knight",i:"⚔️",p:"+40 Max HP — armor forged from retry logic. Endure more wrong answers.",hp:40,xp:0,luck:0,pot:0},
  mage:{n:"Context Mage",i:"🔮",p:"+15% XP from every victory — squeeze more learning from each battle.",hp:0,xp:0.15,luck:0,pot:0},
- weaver:{n:"Loot Weaver",i:"🎁",p:"+5 Luck (rarer loot) and +1 potion each dungeon.",hp:0,xp:0,luck:5,pot:1}};
+ weaver:{n:"Loot Weaver",i:"🍀",p:"+5 Luck (rarer loot) and +1 potion each dungeon.",hp:0,xp:0,luck:5,pot:1}};
 const TITLES=[[1,"Novice Adventurer"],[2,"Apprentice of the API"],[3,"Token Squire"],[4,"Prompt Initiate"],[6,"Context Adept"],[8,"Tool Wielder"],[10,"Agent Vanguard"],[12,"MCP Artificer"],[14,"Guardrail Sentinel"],[16,"Archmage of Integration"],[18,"Dungeonmaster of Claude"],[20,"CCDV-F Ascendant"]];
 
 // ============================ EQUIPMENT ============================
@@ -987,7 +1030,9 @@ function fmt(s){
 }
 function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function rnd(n){return Math.floor(Math.random()*n);}
-function app(html){$("app").innerHTML=html;updateRail();window.scrollTo(0,0);}
+function app(html){$("app").innerHTML=html;updateRail();updateHomeBtn();window.scrollTo(0,0);}
+// persistent Town button — visible on every screen once a hero exists, except the title/class-select screen
+function updateHomeBtn(){const b=$("homebar");if(!b)return;const onTitle=!!$("heroname");const inTown=!!$("townmark");b.hidden=!(S&&!onTitle&&!inTown);}
 const STAT_ABBR={hp:"hp",pow:"pow",xp:"xp",luck:"lck"};
 function bonusShort(g){return `+${g.val}${g.stat==="xp"?"%":""} ${STAT_ABBR[g.stat]}`;}
 function railSlot(k){const g=S.gear[k];const s=SLOTS[k];
@@ -1165,13 +1210,47 @@ function realmBg(k){const g=s=>k+"_"+s;
     <g fill="#5fe08a" opacity=".5">${[[90,58],[240,64],[212,162],[108,166]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="2"/>`).join("")}</g>`);
   default: return wrap(sky("s","#241a40","#180f2c"),`<rect width="320" height="200" ${fill('s')}/>`);
  }}
+// themed background art for each class-selection card (all original SVG)
+function classBg(k){const g=s=>"cb_"+k+"_"+s;
+ const wrap=(defs,body)=>`<svg class="ccbg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid slice"><defs>${defs}</defs>${body}</svg>`;
+ const sky=(id,a,b)=>`<linearGradient id="${g(id)}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+ if(k==="knight")return wrap(
+  sky("s","#2b3a52","#141c2a")+`<linearGradient id="${g('st')}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dfe6f0"/><stop offset=".5" stop-color="#9aa6ba"/><stop offset="1" stop-color="#5c6579"/></linearGradient>`,
+  `<rect width="200" height="200" fill="url(#${g('s')})"/>
+   <g opacity=".13" stroke="#cfe0ff" stroke-width="1">${[40,80,120,160].map(x=>`<line x1="${x}" y1="0" x2="${x}" y2="200"/>`).join("")}</g>
+   <circle cx="100" cy="98" r="70" fill="#0e1524" opacity=".5"/>
+   <path d="M100 40 L146 56 Q150 128 100 162 Q50 128 54 56 Z" fill="#1a2438" stroke="url(#${g('st')})" stroke-width="4"/>
+   ${["-40","40"].map(a=>`<g transform="translate(100 100) rotate(${a})"><rect x="-3" y="-58" width="6" height="86" rx="2" fill="url(#${g('st')})"/><polygon points="0,-67 4.5,-58 -4.5,-58" fill="#eef3fb"/><rect x="-14" y="26" width="28" height="6" rx="3" fill="#6b7488"/><rect x="-2.6" y="30" width="5.2" height="17" rx="2" fill="#8a93a8"/></g>`).join("")}
+   <g fill="#c9d4e6">${[[70,66],[130,66],[70,120],[130,120],[100,150]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="2.4"/>`).join("")}</g>`);
+ if(k==="mage")return wrap(
+  sky("s","#2a1358","#150a2e")+
+  `<radialGradient id="${g('orb')}" cx="50%" cy="42%" r="60%"><stop offset="0" stop-color="#f0e2ff"/><stop offset=".5" stop-color="#b57cf0"/><stop offset="1" stop-color="#6a2fc0"/></radialGradient>`+
+  `<radialGradient id="${g('gl')}" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#c79cff88"/><stop offset="1" stop-color="transparent"/></radialGradient>`,
+  `<rect width="200" height="200" fill="url(#${g('s')})"/>
+   <g fill="#efe0ff">${[[30,34],[64,20],[120,30],[168,26],[186,80],[24,96],[176,140],[40,162]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1.7"/>`).join("")}</g>
+   <ellipse cx="100" cy="104" rx="88" ry="88" fill="url(#${g('gl')})"/>
+   <g fill="none" stroke="#b98ae8" stroke-width="1.4" opacity=".5"><ellipse cx="100" cy="104" rx="72" ry="27"/><ellipse cx="100" cy="104" rx="72" ry="27" transform="rotate(60 100 104)"/><ellipse cx="100" cy="104" rx="72" ry="27" transform="rotate(-60 100 104)"/></g>
+   <circle cx="100" cy="104" r="35" fill="url(#${g('orb')})"/>
+   <path d="M100 104 l4 8.6 9 1.4 -6.5 6.4 1.5 9.2 -8 -4.4 -8 4.4 1.5 -9.2 -6.5 -6.4 9 -1.4 z" fill="#fff4cf" opacity=".92"/>
+   <ellipse cx="89" cy="93" rx="12" ry="8" fill="#ffffff" opacity=".28"/>`);
+ if(k==="weaver")return wrap(
+  sky("s","#2a3a1a","#15220f")+
+  `<radialGradient id="${g('cn')}" cx="50%" cy="38%" r="62%"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#e8c35a"/><stop offset="1" stop-color="#8a6516"/></radialGradient>`+
+  `<radialGradient id="${g('gl')}" cx="50%" cy="62%" r="58%"><stop offset="0" stop-color="#ffe08a55"/><stop offset="1" stop-color="transparent"/></radialGradient>`,
+  `<rect width="200" height="200" fill="url(#${g('s')})"/>
+   <ellipse cx="100" cy="132" rx="98" ry="82" fill="url(#${g('gl')})"/>
+   ${[[36,40],[150,34],[176,92],[26,88]].map(p=>`<path d="M${p[0]} ${p[1]-4} l1.5 3.5 3.7 .5 -2.7 2.7 .6 3.7 -3.1 -1.9 -3.1 1.9 .6 -3.7 -2.7 -2.7 3.7 -.5 z" fill="#ffe08a"/>`).join("")}
+   <g transform="translate(100 76)" stroke="#2f7a30" stroke-width="2"><g fill="#5fbf5a">${[0,90,180,270].map(a=>`<path transform="rotate(${a})" d="M0 -4 C-13 -20 -30 -8 -18 6 C-10 14 0 6 0 -4 Z"/>`).join("")}</g><rect x="-2" y="2" width="4" height="28" rx="2" fill="#2f7a30" stroke="none"/></g>
+   <g>${[[64,152,18],[136,152,18],[100,160,20],[82,140,16],[118,140,16],[100,134,17]].map(c=>`<ellipse cx="${c[0]}" cy="${c[1]}" rx="${c[2]}" ry="${(c[2]*0.66).toFixed(1)}" fill="url(#${g('cn')})" stroke="#7a5c12" stroke-width="1.5"/><ellipse cx="${c[0]}" cy="${c[1]}" rx="${(c[2]*0.55).toFixed(1)}" ry="${(c[2]*0.36).toFixed(1)}" fill="none" stroke="#fff2c0" stroke-width="1" opacity=".5"/>`).join("")}</g>`);
+ return wrap(sky("s","#241a40","#160f28"),`<rect width="200" height="200" fill="url(#${g('s')})"/>`);
+}
 function renderTitle(){ruhaStop();ensureTavern();app(`${logoBlock("big")}<div class="sub">an exploration RPG for aspiring Certified Claude Developers</div>
  <div class="countdown">🗓️ Train across all 8 exam domains — then face the <b>Trial of the Proctor</b> when you're ready.</div>
  <div class="panel"><p class="lore" style="margin-bottom:10px">Eight realms of the Kingdom of Anthropia lie overrun by the <b>Bugs of Ignorance</b>. Explore their dungeons tile by tile: crack open <b>treasure chests</b> for loot, slay wandering monsters, and topple each realm's boss. Every chest and beast poses a real CCDV-F exam question — answer well to claim gear across <b>15 equipment slots</b> and grow strong enough to pass the final Trial.</p>
  <label class="small">Hero name</label><input type="text" id="heroname" maxlength="20" placeholder="Enter your hero name…" autocomplete="off" oninput="if($('nameerr'))$('nameerr').textContent='';" onkeydown="if(event.key==='Enter')newGame();">
  <div id="nameerr" class="small" style="color:var(--bad); min-height:1.1em; margin-top:4px"></div>
  <p class="small" style="margin:8px 0 6px">Choose your class:</p>
- <div class="row">${Object.entries(CLASSES).map(([k,c])=>`<div class="classcard ${k===pickedClass?'sel':''}" id="cc_${k}" onclick="pickClass('${k}')"><div class="cicon">${c.i}</div><h3>${c.n}</h3><p>${c.p}</p></div>`).join("")}</div>
+ <div class="row">${Object.entries(CLASSES).map(([k,c])=>`<div class="classcard ${k===pickedClass?'sel':''}" id="cc_${k}" onclick="pickClass('${k}')">${classBg(k)}<div class="ccshade"></div><div class="ccbody"><div class="cicon">${c.i}</div><h3>${c.n}</h3><p>${c.p}</p></div></div>`).join("")}</div>
  <div class="center" style="margin-top:14px"><button class="btn gold" onclick="newGame()">⚡ Begin the Quest</button></div></div>
  <p class="small center">💾 Your progress saves automatically in this browser — just come back to this page anytime to continue.</p>`);}
 function pickClass(k){pickedClass=k;for(const c in CLASSES){const el=$("cc_"+c);if(el)el.classList.toggle("sel",c===k);}}
@@ -1248,9 +1327,9 @@ function applyNameFx(name){if(isLovableName(name))startLovable();if(isRuha(name)
 // ============================ TOWN ============================
 function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();ensureTavern();
  const li=levelInfo(),rd=readiness(),nem=nemeses(null);
- app(`${logoBlock("sm")}<div class="hud"><div><div class="who">${CLASSES[S.cls].i} ${esc(S.name)} — Lv ${li.l} ${title()}</div>
- <div class="meta">💰 ${S.gold}g · ⚗️ ${S.potions} · ⚔️ ${S.wins} · 📦 ${S.chests} · 🎁 ${S.found} items · 👑 ${S.bosses}${cloudTag()}</div></div>
- <div style="min-width:180px">${bar("xp",li.into/li.need*100,`XP ${li.into}/${li.need}`)}</div></div>
+ app(`${logoBlock("sm")}<span id="townmark" hidden></span><div class="hud"><div><div class="who">${CLASSES[S.cls].i} ${esc(S.name)} — Lv ${li.l} ${title()}</div>
+ <div class="meta">⚗️ ${S.potions} · ⚔️ ${S.wins} · 📦 ${S.chests} · 🎁 ${S.found} items · 👑 ${S.bosses}${cloudTag()}</div></div>
+ <div style="min-width:180px">${bar("xp",li.into/li.need*100,`XP ${li.into}/${li.need}`)}<div class="goldbig">🪙 <b>${S.gold}</b><span class="glabel">gold</span></div></div></div>
  ${cloudBanner()}
  <div class="countdown">🎯 Exam-weighted readiness: <b>${Math.round(rd*100)}%</b>${nem?` · 🩸 ${nem} nemeses at large`:""}</div>
  ${bar("mast",rd*100,"Overall readiness (weighted like the real CCDV-F)")}
@@ -1290,6 +1369,13 @@ function cloudBanner(){const s=cloudStat();if(!s.configured||s.active)return '';
  return `<div class="countdown" style="border-color:#4b6584;color:#a9c0e0">☁ Connecting to the cloud…</div>`;}
 
 // ============================ MAP GENERATION ============================
+const BIOMES=["water","forest","rocky","desert","fire"];
+const BIOME_META={
+ water:{n:"Flooded Hollows",i:"🌊"},
+ forest:{n:"Overgrown Thicket",i:"🌿"},
+ rocky:{n:"Craggy Tunnels",i:"🪨"},
+ desert:{n:"Sunscorched Dunes",i:"🏜️"},
+ fire:{n:"Emberdepths",i:"🔥"}};
 function genMap(dk){const W=9,H=7;
  const grid=[];for(let y=0;y<H;y++){const row=[];for(let x=0;x<W;x++)row.push((x===0||y===0||x===W-1||y===H-1)?1:0);grid.push(row);}
  const px=1,py=H-2;grid[py][px]=0;
@@ -1305,7 +1391,7 @@ function genMap(dk){const W=9,H=7;
  const taken=new Set([bx[0]+","+bx[1]]);
  function place(type){for(let t=0;t<80;t++){const[x,y]=floors[rnd(floors.length)];const kk=x+","+y;if(!taken.has(kk)){taken.add(kk);ents[kk]={type,done:false,x,y};return;}}}
  const nChest=5,nMon=6;for(let i=0;i<nChest;i++)place("chest");for(let i=0;i<nMon;i++)place("monster");place("fountain");
- return {dk,W,H,grid,ents,px,py,hp:maxHp(),chests:0,kills:0,bossDone:false,potTemp:CLASSES[S.cls].pot||0,usedQ:new Set(),totalChests:nChest};}
+ return {dk,W,H,grid,ents,px,py,hp:maxHp(),chests:0,kills:0,bossDone:false,potTemp:CLASSES[S.cls].pot||0,usedQ:new Set(),totalChests:nChest,biome:BIOMES[rnd(BIOMES.length)]};}
 function enterZone(dk){M=genMap(dk);E=null;renderMap();}
 
 // ============================ MAP RENDER ============================
@@ -1322,17 +1408,18 @@ function renderMap(){const d=DOMAINS[M.dk];const li=levelInfo();
   if(here){glyph=CLASSES[S.cls].i;cls+=" here";}
   else if(e){glyph=entGlyph(e);if(e.done)cls+=" done";if(e.type==="boss"&&!e.done)cls+=" boss";}
   if(adj&&!here)cls+=" adj";
-  cells+=`<div class="${cls}" ${adj?`onclick="tryMove(${x},${y})"`:""}>${glyph}</div>`;
+  cells+=`<div class="${cls}" ${adj?`onclick="tryMove(${x},${y})"`:""}>${glyph?`<span class="cg">${glyph}</span>`:""}</div>`;
  }
  const bossE=Object.values(M.ents).find(e=>e.type==="boss");
+ const bm=BIOME_META[M.biome]||BIOME_META.rocky;
  app(`<div class="maphud"><div><div class="who">${d.icon} ${d.name}</div>
- <div class="meta">📦 ${M.chests}/${M.totalChests} chests · ⚔️ ${M.kills} slain · ${bossE.done?"👑 boss down":"👑 boss awaits"}</div></div>
+ <div class="meta">${bm.i} ${bm.n} · 📦 ${M.chests}/${M.totalChests} chests · ⚔️ ${M.kills} slain · ${bossE.done?"👑 boss down":"👑 boss awaits"}</div></div>
  <div style="min-width:180px">${bar("hp",M.hp/maxHp()*100,`HP ${M.hp}/${maxHp()}`)}</div></div>
- <div class="gridwrap"><div class="grid" style="grid-template-columns:repeat(${M.W},1fr)">${cells}</div></div>
+ <div class="gridwrap"><div class="grid bi-${M.biome}" style="grid-template-columns:repeat(${M.W},1fr)">${cells}</div></div>
  <div class="legend"><span>📦 chest</span><span>${d.mobs[0][1]} monster</span><span>${d.boss[1]} boss</span><span>⛲ heal</span><span>${CLASSES[S.cls].i} you</span></div>
- <div class="dpad"><div class="sp"></div><button onclick="move(0,-1)">▲</button><div class="sp"></div>
- <button onclick="move(-1,0)">◀</button><div class="sp"></div><button onclick="move(1,0)">▶</button>
- <div class="sp"></div><button onclick="move(0,1)">▼</button><div class="sp"></div></div>
+ <div class="dpad"><div class="sp"></div><button class="dbtn up" aria-label="Move up" onclick="move(0,-1)">▲</button><div class="sp"></div>
+ <button class="dbtn left" aria-label="Move left" onclick="move(-1,0)">◀</button><div class="hub" title="${bm.n}">${bm.i}</div><button class="dbtn right" aria-label="Move right" onclick="move(1,0)">▶</button>
+ <div class="sp"></div><button class="dbtn down" aria-label="Move down" onclick="move(0,1)">▼</button><div class="sp"></div></div>
  <div class="center small">Tap a glowing tile or use the arrows / keyboard to move. Walk into a chest or monster to face its question.</div>
  <div class="topbtns" style="margin-top:10px">${M.potTemp+S.potions>0&&M.hp<maxHp()?`<button class="btn small" onclick="mapPotion()">⚗️ Potion (+40 HP) — ${M.potTemp+S.potions}</button>`:""}
  <button class="btn small" onclick="statsScreen()">🧝 Gear</button>
