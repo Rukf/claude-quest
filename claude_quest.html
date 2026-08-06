@@ -349,6 +349,16 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
 .holo{animation:holo 3.5s linear infinite;} @keyframes holo{to{filter:hue-rotate(360deg)}}
 .collhead{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin:14px 0 6px;}
 .collhead h3{color:var(--gold2);}
+.collhead h4{font-size:.95em;}
+/* ---------- COMMUNITY SHOWCASE ---------- */
+.scgrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(264px,1fr)); gap:12px;}
+.sccard{border:1px solid var(--border); border-radius:12px; padding:14px; cursor:pointer; background:linear-gradient(165deg,#241a40,#180f2c 72%); box-shadow:0 4px 16px #00000044, inset 0 1px 0 #ffffff0d; transition:transform .16s,border-color .16s,box-shadow .16s;}
+.sccard:hover{transform:translateY(-3px); border-color:#6b5299; box-shadow:0 10px 26px #00000066, 0 0 22px #7a5cc033;}
+.sccard .schead{display:flex; justify-content:space-between; align-items:baseline; gap:8px; margin-bottom:8px;}
+.sccard .scname{font-weight:700; color:var(--gold2); font-size:1.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.scmini{display:flex; gap:4px; align-items:center; margin:9px 0 6px; min-height:40px;}
+.scmini svg{width:38px; height:38px;}
+.scmini .more{color:var(--faint); font-size:.8em; margin-left:2px;}
 /* ---------- HANI easter egg: the hourglass of doom ---------- */
 .crushov{position:fixed; inset:0; z-index:120; overflow:hidden; display:flex; align-items:center; justify-content:center; cursor:pointer;
  background:radial-gradient(circle at 50% 42%, #201338, #06040b); animation:crushfade .25s ease;}
@@ -712,10 +722,86 @@ const CQCloud = (function(){
   async award(kind){ const r = await rpc("award_event", {p_kind:kind}); if(r&&typeof r.gold==="number") S.gold=r.gold; return r; },
   async buyPotion(){ const r = await rpc("buy_potion", {}); if(r&&typeof r.gold==="number") S.gold=r.gold; return r; },
   async openCase(caseKey){ const r = await rpc("open_case", {p_case:caseKey}); if(r&&typeof r.gold==="number") S.gold=r.gold; return r; },
+  async syncShowcase(p){ try{ await rpc("sync_showcase", {p_gear:(p&&p.gear)||{}, p_cls:(p&&p.cls)||null, p_level:(p&&p.level)||1, p_readiness:(p&&p.readiness)||0}); }catch(e){} },
+  async listShowcase(){ return await rpc("list_showcase", {p_limit:300}); },
   async syncState(){ try{ const st=await rpc("get_state",{}); if(st){ if(typeof st.gold==="number")S.gold=st.gold; S.stickers={}; const m=st.stickers||{}; for(const k in m)S.stickers[k]=m[k];} }catch(e){} },
  };
 })();
 if(typeof window!=="undefined") window.CQCloud = CQCloud;
+// ============================ COMMUNITY SHOWCASE ============================
+// Browse every player's gear loadout + sticker collection (server-backed).
+let SHOWCASE=null, _scLast=0;
+// push my current loadout snapshot to the server (throttled)
+function cloudSyncShowcase(force){
+ if(!(window.CQCloud&&window.CQCloud.active())||!S)return;
+ const t=Date.now();if(!force&&t-_scLast<8000)return;_scLast=t;
+ window.CQCloud.syncShowcase({gear:S.gear||{},cls:S.cls,level:levelInfo().l,readiness:Math.round(readiness()*100)});
+}
+// ---- renderers that take explicit data (another player's) ----
+function scPslot(gear,k){const g=gear&&gear[k];const s=SLOTS[k];
+ if(!g)return `<div class="pslot empty"><div class="pi">${s.i}</div><div class="pinfo"><div class="pn">${s.n}</div><div class="ps">— empty —</div></div></div>`;
+ return `<div class="pslot q-${g.rarity}"><div class="pi">${g.icon||s.i}</div><div class="pinfo"><div class="pn r-${g.rarity}">${esc(g.name||s.n)}</div><div class="ps">${rtag(g.rarity)}${bonusStr(g)}</div></div></div>`;}
+function scSumStat(gear,stat){let t=0;for(const k of SLOT_KEYS){const g=gear&&gear[k];if(g&&SLOTS[k].stat===stat)t+=(g.val||0);}return t;}
+function scPaperdoll(gear,cls){return `<div class="paperdoll">
+ <div class="pcol">${SLOT_LEFT.map(k=>scPslot(gear,k)).join("")}</div>
+ <div class="pcenter"><div class="pav">${(CLASSES[cls]&&CLASSES[cls].i)||"🧝"}</div>
+  <div class="statchip">❤️ <b>+${scSumStat(gear,"hp")}</b> HP</div>
+  <div class="statchip">⚔️ <b>+${scSumStat(gear,"pow")}</b> Power</div>
+  <div class="statchip">✨ <b>+${scSumStat(gear,"xp")}%</b> XP</div>
+  <div class="statchip">🍀 <b>+${scSumStat(gear,"luck")}</b> Luck</div></div>
+ <div class="pcol">${SLOT_RIGHT.map(k=>scPslot(gear,k)).join("")}</div></div>`;}
+function scGearCount(gear){let n=0;for(const k of SLOT_KEYS)if(gear&&gear[k])n++;return n;}
+function scFinest(gear){let best=null;for(const k of SLOT_KEYS){const g=gear&&gear[k];if(g&&(!best||itemValue(g)>itemValue(best)))best=g;}return best;}
+function scCollItem(s,cnt){const own=cnt>0;
+ return `<div class="collitem ${own?"":"missing"}" title="${esc(s.name)} · ${RNAME[s.rar]}">${own&&cnt>1?`<span class="cnt">×${cnt}</span>`:""}${stickerSVG(s)}<div class="cn">${own?esc(s.name):"???"}</div><div class="cbar rc-${s.rar}"></div></div>`;}
+const _RORD=["legend","epic","rare","uncommon","common"];
+function scMiniStickers(map,n){const owned=[];for(const s of STICKERS)if(map[String(s.id)])owned.push(s);
+ owned.sort((a,b)=>_RORD.indexOf(a.rar)-_RORD.indexOf(b.rar));
+ const show=owned.slice(0,n).map(s=>stickerSVG(s)).join("");
+ const extra=owned.length>n?`<span class="more">+${owned.length-n}</span>`:(owned.length?"":`<span class="more">no stickers yet</span>`);
+ return show+extra;}
+
+// ---- list screen ----
+function showcaseScreen(){
+ if(!(window.CQCloud&&window.CQCloud.active())){
+  app(`<h1>👥 Community Showcase</h1><div class="sub">See everyone's gear &amp; sticker collections</div>
+   <div class="panel center"><p class="lore">The showcase is online-only — it needs the cloud connection.${(window.CQCloud&&window.CQCloud.status&&window.CQCloud.status().error)?`<br><span class="small" style="color:var(--bad)">${esc(window.CQCloud.status().error)}</span>`:""}</p></div>
+   <div class="center"><button class="btn gold" onclick="town()">🏰 Back to town</button></div>`);return;}
+ app(`<h1>👥 Community Showcase</h1><div class="sub">Loading players…</div><div class="panel center"><p class="lore">📡 Fetching the guild roster…</p></div>`);
+ cloudSyncShowcase(true);
+ window.CQCloud.listShowcase().then(list=>{SHOWCASE=Array.isArray(list)?list:[];renderShowcaseList();})
+  .catch(e=>{app(`<h1>👥 Community Showcase</h1><div class="panel center"><p class="lore">Couldn't load the roster.<br><span class="small" style="color:var(--bad)">${esc(e.message)}</span></p></div><div class="center"><button class="btn" onclick="showcaseScreen()">↻ Retry</button> <button class="btn gold" onclick="town()">🏰 Town</button></div>`);});
+}
+function renderShowcaseList(){const tot=STICKERS.length;
+ const rows=SHOWCASE.slice();
+ app(`<div class="hud"><div><div class="who">👥 Community Showcase</div><div class="meta">${rows.length} player${rows.length===1?"":"s"} · ranked by collection</div></div>
+   <div style="min-width:150px"><button class="btn small" style="width:100%" onclick="collectionScreen()">🗂️ My collection</button></div></div>
+  ${rows.length?`<div class="scgrid">${rows.map((p,i)=>{const fin=scFinest(p.gear);
+    return `<div class="sccard" onclick="showcaseDetail(${i})">
+      <div class="schead"><div class="scname">${(CLASSES[p.cls]&&CLASSES[p.cls].i)||"🧝"} ${esc(p.name||"Adventurer")}</div>
+        <div class="small">Lv ${p.level||1} · 🗂️ ${p.uniques||0}/${tot}</div></div>
+      ${bar("mast",p.readiness||0,`Readiness ${p.readiness||0}%`)}
+      <div class="scmini">${scMiniStickers(p.stickers||{},7)}</div>
+      <div class="small">🎒 ${scGearCount(p.gear)}/${SLOT_KEYS.length} gear${fin?` · 👑 <span class="r-${fin.rarity}">${esc(fin.name)}</span>`:""}</div>
+    </div>`;}).join("")}</div>`
+   :`<div class="panel center"><p class="lore">No players have synced a showcase yet — be the first! Play a bit, then check back.</p></div>`}
+  <div class="center" style="margin-top:18px"><button class="btn gold" onclick="town()">🏰 Back to town</button></div>`);
+}
+function showcaseDetail(i){const p=SHOWCASE&&SHOWCASE[i];if(!p){showcaseScreen();return;}
+ const map=p.stickers||{},tot=STICKERS.length,uniq=p.uniques||0,ord=["common","uncommon","rare","epic","legend"];
+ app(`<div class="hud"><div><div class="who">${(CLASSES[p.cls]&&CLASSES[p.cls].i)||"🧝"} ${esc(p.name||"Adventurer")}</div>
+    <div class="meta">Lv ${p.level||1}${p.cls&&CLASSES[p.cls]?" · "+CLASSES[p.cls].n:""} · 🗂️ ${uniq}/${tot} stickers</div></div>
+   <div style="min-width:150px"><button class="btn small" style="width:100%" onclick="renderShowcaseList()">⬅ All players</button></div></div>
+  ${bar("mast",p.readiness||0,`Exam readiness ${p.readiness||0}%`)}
+  <div class="panel"><h3 style="color:var(--gold2);margin-bottom:4px">🧝 Gear loadout</h3>${scPaperdoll(p.gear,p.cls)}</div>
+  <div class="panel"><div class="collhead"><h3 style="color:var(--gold2)">🗂️ Sticker collection</h3><span class="small">${uniq}/${tot}</span></div>
+   ${bar("xp",uniq/tot*100,`Collection ${Math.round(uniq/tot*100)}%`)}
+   ${CASE_DEFS.map(cd=>{const cs=CASE_BY[cd.key];const owned=cs.items.filter(s=>map[String(s.id)]).length;
+     return `<div class="collhead"><h4 style="color:var(--dim);font-weight:700">${cs.name}</h4><span class="small">${owned}/${cs.items.length}</span></div>
+      <div class="collgrid">${cs.items.slice().sort((a,b)=>ord.indexOf(a.rar)-ord.indexOf(b.rar)).map(s=>scCollItem(s,map[String(s.id)]||0)).join("")}</div>`;}).join("")}</div>
+  <div class="center" style="margin-top:16px"><button class="btn" onclick="renderShowcaseList()">⬅ All players</button> <button class="btn gold" onclick="town()">🏰 Town</button></div>`);
+ window.scrollTo(0,0);
+}
 // ============================ WORLD DATA ============================
 const DOMAINS={
 apps:{name:"The Integration Citadel",icon:"🏰",weight:33.1,desc:"Applications & Integration — API mechanics, app design, SWE foundations",
@@ -991,10 +1077,12 @@ function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
  <button class="btn" onclick="buyPotion()">⚗️ Buy potion (25g)</button>
  <button class="btn" onclick="caseShopScreen()">🎟️ Sticker Vault</button>
  <button class="btn gold" onclick="raidIntro()">🏛️ Trial of the Proctor (mock exam)</button>
+ <button class="btn" onclick="showcaseScreen()">👥 Showcase</button>
  <button class="btn" onclick="leaderboardScreen()">🏆 Leaderboard</button>
  <button class="btn" onclick="exportSave()">📤 Backup</button>
  <button class="btn danger" onclick="resetProgress()">🆕 New hero</button></div>
- <p class="small center" style="margin-top:10px">💾 Progress saves automatically in this browser.</p>`);}
+ <p class="small center" style="margin-top:10px">💾 Progress saves automatically in this browser.</p>`);
+ cloudSyncShowcase();}
 function buyPotion(){
  if(window.CQCloud&&window.CQCloud.active()){
   if(S.gold<25){town();return;}
