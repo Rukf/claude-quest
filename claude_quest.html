@@ -359,6 +359,34 @@ hr{border:none; border-top:1px solid #2a2242; margin:12px 0;}
 .scmini{display:flex; gap:4px; align-items:center; margin:9px 0 6px; min-height:40px;}
 .scmini svg{width:38px; height:38px;}
 .scmini .more{color:var(--faint); font-size:.8em; margin-left:2px;}
+/* ---------- TOWN MENU (icon-tile action grid) ---------- */
+.menu-primary{margin-top:18px;}
+.menu-primary button{width:100%; font-size:1.06em; padding:15px; letter-spacing:.3px;}
+.menugrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; margin-top:12px;}
+.mtile{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:15px 8px; cursor:pointer; text-align:center;
+  border:1px solid var(--border); border-radius:14px; background:linear-gradient(180deg,#241a40,#180f2c); box-shadow:inset 0 1px 0 #ffffff0d; transition:transform .14s,border-color .14s,box-shadow .14s;}
+.mtile:hover{transform:translateY(-3px); border-color:var(--gold); box-shadow:0 10px 22px #00000055, 0 0 18px #e8c35a26;}
+.mtile .mi{font-size:1.8em; line-height:1; filter:drop-shadow(0 2px 4px #0006);}
+.mtile .ml{font-size:.86em; font-weight:700; color:var(--text); line-height:1.1;}
+.mtile .msub{font-size:.68em; color:var(--faint); letter-spacing:.02em;}
+.mtile.danger{border-color:#4a2530; background:linear-gradient(180deg,#2a1620,#180d14);}
+.mtile.danger:hover{border-color:#c9603f; box-shadow:0 10px 22px #00000055, 0 0 18px #c9603f2e;}
+.mtile.danger .ml{color:#e0a08f;}
+.menusec{font-size:.68em; letter-spacing:.16em; text-transform:uppercase; color:var(--faint); font-weight:700; margin:18px 0 4px; display:flex; align-items:center; gap:8px;}
+.menusec::after{content:""; flex:1; height:1px; background:linear-gradient(90deg,var(--border),transparent);}
+/* ---------- CLAUDE QUEST LOGO ---------- */
+.cqlogo{text-align:center; margin:4px 0 12px;}
+.cqlogo .cqemblem{line-height:0;}
+.cqlogo .cqemblem svg{width:104px; height:auto; filter:drop-shadow(0 5px 12px #000a) drop-shadow(0 0 20px #e8c35a3a);}
+.cqword{font-family:Georgia,'Times New Roman',serif; font-weight:700; letter-spacing:2px; font-size:2.6em; line-height:1.02; margin-top:6px;
+  color:#e8c35a; background:linear-gradient(180deg,#fff0bd 0%,#f0cf6a 46%,#c79a2c 72%,#8a6516 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 2px 0 #3a2a08) drop-shadow(0 3px 10px #000a);}
+.cqtag{font-family:Georgia,serif; font-style:italic; color:var(--gold2); opacity:.85; letter-spacing:1px; font-size:.9em; margin-top:5px;}
+.cqlogo.sm{display:flex; align-items:center; justify-content:center; gap:11px; margin:2px 0 12px;}
+.cqlogo.sm .cqemblem svg{width:46px; filter:drop-shadow(0 3px 6px #0009);}
+.cqlogo.sm .cqword{font-size:1.5em; margin-top:0;}
+.cqlogo.sm .cqtag{display:none;}
+@media(max-width:560px){ .cqword{font-size:2em;} }
 /* ---------- HANI easter egg: the hourglass of doom ---------- */
 .crushov{position:fixed; inset:0; z-index:120; overflow:hidden; display:flex; align-items:center; justify-content:center; cursor:pointer;
  background:radial-gradient(circle at 50% 42%, #201338, #06040b); animation:crushfade .25s ease;}
@@ -981,7 +1009,25 @@ if(typeof window!=="undefined"&&!window.__saveHook){window.__saveHook=true;
 
 // ============================ TITLE / NEW GAME ============================
 let pickedClass="knight";
-function renderTitle(){ruhaStop();app(`<h1>⚔️ CLAUDE QUEST ⚔️</h1><div class="sub">The CCDV-F Chronicles — an exploration RPG for aspiring Certified Claude Developers</div>
+function cqEmblem(){return `<svg viewBox="0 0 140 128" class="cqem"><defs>
+ <linearGradient id="cqgold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0bd"/><stop offset=".5" stop-color="#e8c35a"/><stop offset="1" stop-color="#8a6516"/></linearGradient>
+ <linearGradient id="cqblade" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9e9f2"/><stop offset=".5" stop-color="#c3c3d2"/><stop offset="1" stop-color="#8f8fa4"/></linearGradient>
+ <linearGradient id="cqgem" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d7b3ff"/><stop offset="1" stop-color="#7a3fd0"/></linearGradient>
+ <radialGradient id="cqglow" cx="50%" cy="46%" r="55%"><stop offset="0" stop-color="#e8c35a55"/><stop offset="1" stop-color="transparent"/></radialGradient></defs>
+ <circle cx="70" cy="60" r="52" fill="url(#cqglow)"/>
+ ${["-34","34"].map(a=>`<g transform="translate(70 62) rotate(${a})">
+   <path d="M-3.5 -50 L0 -58 L3.5 -50 L3.5 24 L-3.5 24 Z" fill="url(#cqblade)" stroke="#5a5a6e" stroke-width="1"/>
+   <rect x="-15" y="22" width="30" height="7" rx="3" fill="url(#cqgold)" stroke="#5a4410" stroke-width="1"/>
+   <rect x="-3" y="29" width="6" height="17" rx="2" fill="#5a4a2a"/>
+   <circle cx="0" cy="49" r="6" fill="url(#cqgold)" stroke="#5a4410" stroke-width="1"/></g>`).join("")}
+ <path d="M70 24 L104 36 Q104 92 70 112 Q36 92 36 36 Z" fill="#1b1533" stroke="url(#cqgold)" stroke-width="4.5" stroke-linejoin="round"/>
+ <path d="M70 24 L104 36 Q104 92 70 112 Q36 92 36 36 Z" fill="none" stroke="#00000055" stroke-width="1.5"/>
+ <path d="M70 52 L84 66 L70 92 L56 66 Z" fill="url(#cqgem)" stroke="#fff6" stroke-width="1.5"/>
+ <path d="M70 52 L70 92 M56 66 L84 66" stroke="#ffffff44" stroke-width="1.2"/>
+ <circle cx="65" cy="61" r="3" fill="#ffffffcc"/>
+ <text x="112" y="30" font-size="13" fill="#ffe9a8">✦</text><text x="24" y="34" font-size="10" fill="#ffe9a8">✦</text></svg>`;}
+function logoBlock(cls){return `<div class="cqlogo ${cls||""}"><div class="cqemblem">${cqEmblem()}</div><div class="cqword">Claude Quest</div><div class="cqtag">⚜ The CCDV-F Chronicles ⚜</div></div>`;}
+function renderTitle(){ruhaStop();app(`${logoBlock("big")}<div class="sub">an exploration RPG for aspiring Certified Claude Developers</div>
  <div class="countdown">🗓️ Train across all 8 exam domains — then face the <b>Trial of the Proctor</b> when you're ready.</div>
  <div class="panel"><p class="lore" style="margin-bottom:10px">Eight realms of the Kingdom of Anthropia lie overrun by the <b>Bugs of Ignorance</b>. Explore their dungeons tile by tile: crack open <b>treasure chests</b> for loot, slay wandering monsters, and topple each realm's boss. Every chest and beast poses a real CCDV-F exam question — answer well to claim gear across <b>15 equipment slots</b> and grow strong enough to pass the final Trial.</p>
  <label class="small">Hero name</label><input type="text" id="heroname" maxlength="20" placeholder="Enter your hero name…" autocomplete="off" oninput="if($('nameerr'))$('nameerr').textContent='';" onkeydown="if(event.key==='Enter')newGame();">
@@ -1064,7 +1110,7 @@ function applyNameFx(name){if(isLovableName(name))startLovable();if(isRuha(name)
 // ============================ TOWN ============================
 function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
  const li=levelInfo(),rd=readiness(),nem=nemeses(null);
- app(`<div class="hud"><div><div class="who">${CLASSES[S.cls].i} ${esc(S.name)} — Lv ${li.l} ${title()}</div>
+ app(`${logoBlock("sm")}<div class="hud"><div><div class="who">${CLASSES[S.cls].i} ${esc(S.name)} — Lv ${li.l} ${title()}</div>
  <div class="meta">💰 ${S.gold}g · ⚗️ ${S.potions} · ⚔️ ${S.wins} · 📦 ${S.chests} · 🎁 ${S.found} items · 👑 ${S.bosses}${cloudTag()}</div></div>
  <div style="min-width:180px">${bar("xp",li.into/li.need*100,`XP ${li.into}/${li.need}`)}</div></div>
  ${cloudBanner()}
@@ -1072,16 +1118,22 @@ function town(){M=null;E=null;if(R&&R.t){clearInterval(R.t);R=null;}autoSave();
  ${bar("mast",rd*100,"Overall readiness (weighted like the real CCDV-F)")}
  <h2 style="color:var(--gold2);margin:16px 0 8px">🗺️ Choose a realm to explore</h2>
  <div class="zonegrid">${Object.entries(DOMAINS).map(([k,d])=>{const m=Math.round(mastery(k)*100);const cl=S.cleared[k]?' ✅':'';return `<div class="zone" onclick="enterZone('${k}')"><span class="zicon">${d.icon}</span><h3>${d.name}${cl}</h3><div class="zdesc">${d.desc}</div><span class="wtag">${d.weight}% of exam</span>${bar("mast",m,`Mastery ${m}%`)}</div>`;}).join("")}</div>
- <div class="topbtns" style="margin-top:16px">
- <button class="btn" onclick="statsScreen()">🧝 Character & Gear</button>
- <button class="btn" onclick="buyPotion()">⚗️ Buy potion (25g)</button>
- <button class="btn" onclick="caseShopScreen()">🎟️ Sticker Vault</button>
- <button class="btn gold" onclick="raidIntro()">🏛️ Trial of the Proctor (mock exam)</button>
- <button class="btn" onclick="showcaseScreen()">👥 Showcase</button>
- <button class="btn" onclick="leaderboardScreen()">🏆 Leaderboard</button>
- <button class="btn" onclick="exportSave()">📤 Backup</button>
- <button class="btn danger" onclick="resetProgress()">🆕 New hero</button></div>
- <p class="small center" style="margin-top:10px">💾 Progress saves automatically in this browser.</p>`);
+ <div class="menusec">⚔ Play</div>
+ <div class="menu-primary"><button class="btn gold" onclick="raidIntro()">🏛️ Enter the Trial of the Proctor — full mock exam</button></div>
+ <div class="menusec">🎒 Progress</div>
+ <div class="menugrid">
+  <div class="mtile" onclick="statsScreen()"><span class="mi">🧝</span><span class="ml">Character</span><span class="msub">gear &amp; stats</span></div>
+  <div class="mtile" onclick="caseShopScreen()"><span class="mi">🎟️</span><span class="ml">Sticker Vault</span><span class="msub">open cases</span></div>
+  <div class="mtile" onclick="showcaseScreen()"><span class="mi">👥</span><span class="ml">Showcase</span><span class="msub">all players</span></div>
+  <div class="mtile" onclick="leaderboardScreen()"><span class="mi">🏆</span><span class="ml">Leaderboard</span><span class="msub">top scores</span></div>
+ </div>
+ <div class="menusec">⚙ Account</div>
+ <div class="menugrid">
+  <div class="mtile" onclick="buyPotion()"><span class="mi">⚗️</span><span class="ml">Buy Potion</span><span class="msub">25 gold</span></div>
+  <div class="mtile" onclick="exportSave()"><span class="mi">📤</span><span class="ml">Backup</span><span class="msub">save code</span></div>
+  <div class="mtile danger" onclick="resetProgress()"><span class="mi">🆕</span><span class="ml">New Hero</span><span class="msub">reset run</span></div>
+ </div>
+ <p class="small center" style="margin-top:12px">💾 Progress saves automatically in this browser.</p>`);
  cloudSyncShowcase();}
 function buyPotion(){
  if(window.CQCloud&&window.CQCloud.active()){
